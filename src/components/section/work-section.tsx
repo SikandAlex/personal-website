@@ -14,17 +14,22 @@ import { cn } from "@/lib/utils";
 function LogoImage({ src, alt }: { src: string; alt: string }) {
   const [imageError, setImageError] = useState(false);
 
+  const sizingStyle = {
+    width: "var(--logo-size, 80px)",
+    height: "var(--logo-size, 80px)",
+    borderRadius: "var(--logo-radius, 8px)",
+  } as const;
+
   if (!src || imageError) {
-    return (
-      <div className="size-12 md:size-14 rounded-lg bg-muted flex-none" />
-    );
+    return <div className="bg-muted flex-none" style={sizingStyle} />;
   }
 
   return (
     <img
       src={src}
       alt={alt}
-      className="size-12 md:size-14 object-contain flex-none"
+      className="object-contain flex-none"
+      style={sizingStyle}
       onError={() => setImageError(true)}
     />
   );

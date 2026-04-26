@@ -79,10 +79,22 @@ export default function Page() {
                       <img
                         src={education.logoUrl}
                         alt={education.school}
-                        className="size-12 md:size-14 object-contain flex-none"
+                        className="object-contain flex-none"
+                        style={{
+                          width: "var(--logo-size, 80px)",
+                          height: "var(--logo-size, 80px)",
+                          borderRadius: "var(--logo-radius, 8px)",
+                        }}
                       />
                     ) : (
-                      <div className="size-12 md:size-14 rounded-lg bg-muted flex-none" />
+                      <div
+                        className="bg-muted flex-none"
+                        style={{
+                          width: "var(--logo-size, 80px)",
+                          height: "var(--logo-size, 80px)",
+                          borderRadius: "var(--logo-radius, 8px)",
+                        }}
+                      />
                     )}
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                       <div className="font-semibold leading-none">

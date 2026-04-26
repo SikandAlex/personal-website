@@ -2,11 +2,11 @@
 "use client";
 
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { DATA } from "@/data/resume";
 import Markdown from "react-markdown";
 
 const MARKER_SIZE = 48;
+const LABEL_LOGO_SIZE = 40;
 
 function MarkerLogo({ src, alt }: { src: string; alt: string }) {
   const [imageError, setImageError] = useState(false);
@@ -47,7 +47,15 @@ export default function WorkSectionTimeline() {
           className="relative flex justify-end gap-2"
         >
           <div className="sticky top-4 flex w-32 flex-col items-end gap-2 self-start pb-4 max-md:hidden">
-            <Badge className="rounded-sm font-medium">{work.company}</Badge>
+            <img
+              src={work.logoUrl}
+              alt={work.company}
+              className="object-contain"
+              style={{
+                width: `${LABEL_LOGO_SIZE}px`,
+                height: `${LABEL_LOGO_SIZE}px`,
+              }}
+            />
             <div className="text-muted-foreground text-right text-xs font-medium tabular-nums">
               {work.start} - {work.end ?? "Present"}
             </div>
@@ -63,9 +71,15 @@ export default function WorkSectionTimeline() {
           </div>
           <div className="flex flex-1 flex-col gap-3 pb-8 pl-3 md:pl-6">
             <div className="flex flex-col gap-2 md:hidden">
-              <Badge className="rounded-sm font-medium w-fit">
-                {work.company}
-              </Badge>
+              <img
+                src={work.logoUrl}
+                alt={work.company}
+                className="object-contain"
+                style={{
+                  width: `${LABEL_LOGO_SIZE}px`,
+                  height: `${LABEL_LOGO_SIZE}px`,
+                }}
+              />
               <div className="font-medium text-xs tabular-nums">
                 {work.start} - {work.end ?? "Present"}
               </div>

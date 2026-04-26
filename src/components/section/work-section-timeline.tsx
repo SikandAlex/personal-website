@@ -42,12 +42,10 @@ export default function WorkSectionTimeline() {
               </div>
             </div>
             <div className="flex flex-col items-center">
-              {!isFirst && (
-                <span
-                  className="w-px border"
-                  style={{ height: DOT_OFFSET }}
-                />
-              )}
+              <span
+                className={isFirst ? "w-px" : "w-px border"}
+                style={{ height: DOT_OFFSET }}
+              />
               <div
                 className="sticky flex size-6 items-center justify-center"
                 style={{ top: `calc(1rem + ${DOT_OFFSET})` }}

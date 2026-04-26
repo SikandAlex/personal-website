@@ -97,7 +97,7 @@ export const DATA = {
       company: "Impel",
       href: "https://impel.ai",
       badges: [],
-      location: "Syracuse, NY",
+      location: "Remote",
       title: "Software Engineer",
       logoUrl: "/impel.png",
       start: "Feb 2024",

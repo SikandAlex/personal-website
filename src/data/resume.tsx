@@ -202,7 +202,7 @@ export const DATA = {
       dates: "2026",
       active: true,
       description:
-        "A VIP Discord lounge for your paying Substack subscribers. Connect Stripe once and StackPass grants a Discord role the moment a reader subscribes — and removes it the moment they cancel.",
+        "Auto-sync your paying Substack subscribers to a private Discord role. Cancellations revoke access automatically.",
       technologies: [
         "TypeScript",
         "Next.js",
@@ -218,7 +218,7 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image: "",
+      image: "https://getstackpass.com/img/og-image.png",
       video: "",
     },
   ],

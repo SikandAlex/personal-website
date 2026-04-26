@@ -79,10 +79,10 @@ export default function Page() {
                       <img
                         src={education.logoUrl}
                         alt={education.school}
-                        className="size-12 md:size-14 border rounded-lg shadow ring-2 ring-border overflow-hidden object-contain flex-none bg-white"
+                        className="size-12 md:size-14 object-contain flex-none"
                       />
                     ) : (
-                      <div className="size-12 md:size-14 border rounded-lg shadow ring-2 ring-border bg-muted flex-none" />
+                      <div className="size-12 md:size-14 rounded-lg bg-muted flex-none" />
                     )}
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                       <div className="font-semibold leading-none">

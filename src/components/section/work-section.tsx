@@ -16,7 +16,7 @@ function LogoImage({ src, alt }: { src: string; alt: string }) {
 
   if (!src || imageError) {
     return (
-      <div className="size-12 md:size-14 border rounded-lg shadow ring-2 ring-border bg-muted flex-none" />
+      <div className="size-12 md:size-14 rounded-lg bg-muted flex-none" />
     );
   }
 
@@ -24,7 +24,7 @@ function LogoImage({ src, alt }: { src: string; alt: string }) {
     <img
       src={src}
       alt={alt}
-      className="size-12 md:size-14 border rounded-lg shadow ring-2 ring-border overflow-hidden object-contain flex-none bg-white"
+      className="size-12 md:size-14 object-contain flex-none"
       onError={() => setImageError(true)}
     />
   );

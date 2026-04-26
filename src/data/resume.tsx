@@ -25,8 +25,7 @@ export const DATA = {
   url: "https://alexsikand.com",
   location: "San Francisco, CA",
   locationLink: "https://www.google.com/maps/place/sanfrancisco",
-  description:
-    "Full-Stack Machine Learning Engineer based in San Francisco.",
+  description: "Full-Stack AI Engineer",
   summary:
     "Versatile Full-Stack Engineer who transforms complex technical challenges into scalable solutions. I've built production systems from research prototypes, modernized legacy enterprise codebases, and architected cloud infrastructure for high-traffic applications. I thrive in cross-functional environments where technical excellence meets business impact.",
   avatarUrl: "/alex-sikand.png",

@@ -91,7 +91,7 @@ export const DATA = {
       start: "Jan 2025",
       end: "Present",
       description:
-        "Built a production voice AI platform from zero to revenue — engineered a low-latency STT-LLM-TTS pipeline with LiveKit and Twilio handling inbound calls, appointment booking, lead qualification, and after-hours routing for field service businesses. Built Node.js/Express API, React + Vite frontend, Next.js SEO-optimized landing page, Redis job queues, and Stripe billing — deployed across AWS in separate staging/production environments. Sole engineer from architecture through deployment — shipped end-to-end product, integrated webhooks and CRM automation, and acquired 100+ paying customers.",
+        "- Built a production voice AI platform from zero to revenue — engineered a low-latency STT-LLM-TTS pipeline with LiveKit and Twilio handling inbound calls, appointment booking, lead qualification, and after-hours routing for field service businesses.\n- Built Node.js/Express API, React + Vite frontend, Next.js SEO-optimized landing page, Redis job queues, and Stripe billing — deployed across AWS in separate staging/production environments.\n- Sole engineer from architecture through deployment — shipped end-to-end product, integrated webhooks and CRM automation, and acquired 100+ paying customers.",
     },
     {
       company: "Impel",
@@ -103,7 +103,7 @@ export const DATA = {
       start: "Feb 2024",
       end: "Jan 2025",
       description:
-        "Contributed to comprehensive AWS cloud infrastructure (Fargate, S3, RDS PostgreSQL, DynamoDB, MongoDB Atlas, Lambda, API Gateway, ECS, SQS, SES) using CDK CloudFormation infrastructure-as-code, serving 1,000+ car dealerships, processing 250,000+ outbound messages daily. Helped to maintain ServiceAI omni-channel platform for re-activating dealership customers and extracting maximum customer lifetime value through seamless email (AWS SES) and SMS (Twilio) agent integration.",
+        "- Contributed to comprehensive AWS cloud infrastructure (Fargate, S3, RDS PostgreSQL, DynamoDB, MongoDB Atlas, Lambda, API Gateway, ECS, SQS, SES) using CDK CloudFormation infrastructure-as-code, serving 1,000+ car dealerships, processing 250,000+ outbound messages daily.\n- Helped to maintain ServiceAI omni-channel platform for re-activating dealership customers and extracting maximum customer lifetime value through seamless email (AWS SES) and SMS (Twilio) agent integration.",
     },
     {
       company: "Pivotal",
@@ -115,7 +115,7 @@ export const DATA = {
       start: "Jul 2022",
       end: "Jun 2023",
       description:
-        "Developed Python Django backend infrastructure for processing big data files from eVTOL aircraft telemetry, handling long-running processing jobs for flight data analysis. Refactored 30+ MaterialUI components from v0 to v3 and converted React class components to functional hooks by hand, programmatically generated a proof-of-concept OpenAPI OAS3 schema for over 400+ API methods.",
+        "- Developed Python Django backend infrastructure for processing big data files from eVTOL aircraft telemetry, handling long-running processing jobs for flight data analysis.\n- Refactored 30+ MaterialUI components from v0 to v3 and converted React class components to functional hooks by hand, programmatically generated a proof-of-concept OpenAPI OAS3 schema for over 400+ API methods.",
     },
     {
       company: "Silk Labs",
@@ -127,7 +127,7 @@ export const DATA = {
       start: "Sep 2020",
       end: "Jul 2022",
       description:
-        "Led ML Ops team at Silk Labs, created labeling pipelines for synthetically generated images using Python notebooks, Weights & Biases for training runs, and training on RTX 2080 Ti and V100 GPUs. Productionized computer vision models for stadium crowd-scale facial detection, firearm detection with low latency reporting, and super-resolution using Nvidia Triton Inference Server and INT8 quantization, supporting 150+ concurrent camera feeds via RTSP streams enabled by Pion WebRTC to reduce latency.",
+        "- Led ML Ops team at Silk Labs, created labeling pipelines for synthetically generated images using Python notebooks, Weights & Biases for training runs, and training on RTX 2080 Ti and V100 GPUs.\n- Productionized computer vision models for stadium crowd-scale facial detection, firearm detection with low latency reporting, and super-resolution using Nvidia Triton Inference Server and INT8 quantization, supporting 150+ concurrent camera feeds via RTSP streams enabled by Pion WebRTC to reduce latency.",
     },
   ],
   education: [

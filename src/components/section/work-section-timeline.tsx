@@ -1,6 +1,42 @@
+/* eslint-disable @next/next/no-img-element */
+"use client";
+
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { DATA } from "@/data/resume";
 import Markdown from "react-markdown";
+
+const MARKER_SIZE = 48;
+
+function MarkerLogo({ src, alt }: { src: string; alt: string }) {
+  const [imageError, setImageError] = useState(false);
+
+  const sizingStyle = {
+    width: `${MARKER_SIZE}px`,
+    height: `${MARKER_SIZE}px`,
+  } as const;
+
+  if (!src || imageError) {
+    return (
+      <span
+        className="bg-primary/20 flex items-center justify-center rounded-full"
+        style={sizingStyle}
+      >
+        <span className="bg-primary size-3 rounded-full" />
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="rounded-md object-contain"
+      style={sizingStyle}
+      onError={() => setImageError(true)}
+    />
+  );
+}
 
 export default function WorkSectionTimeline() {
   return (
@@ -17,12 +53,13 @@ export default function WorkSectionTimeline() {
             </div>
           </div>
           <div className="flex flex-col items-center">
-            <div className="sticky top-4 flex size-6 items-center justify-center">
-              <span className="bg-primary/20 flex size-[18px] shrink-0 items-center justify-center rounded-full">
-                <span className="bg-primary size-3 rounded-full" />
-              </span>
+            <div
+              className="sticky top-4 flex shrink-0 items-center justify-center"
+              style={{ width: MARKER_SIZE, height: MARKER_SIZE }}
+            >
+              <MarkerLogo src={work.logoUrl} alt={work.company} />
             </div>
-            <span className="-mt-2.5 w-px flex-1 border" />
+            <span className="w-px flex-1 border mt-1" />
           </div>
           <div className="flex flex-1 flex-col gap-3 pb-8 pl-3 md:pl-6">
             <div className="flex flex-col gap-2 md:hidden">

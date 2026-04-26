@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 const DEFAULT_SIZE = 80;
 const DEFAULT_RADIUS = 8;
+const DEFAULT_DATE_GAP = 8;
 const DEFAULT_WORK_STYLE: WorkStyle = "accordion";
 
 type WorkStyle = "accordion" | "timeline";
@@ -12,13 +13,18 @@ type WorkStyle = "accordion" | "timeline";
 export default function LogoControls() {
   const [size, setSize] = useState(DEFAULT_SIZE);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
+  const [dateGap, setDateGap] = useState(DEFAULT_DATE_GAP);
   const [workStyle, setWorkStyle] = useState<WorkStyle>(DEFAULT_WORK_STYLE);
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--logo-size", `${size}px`);
     document.documentElement.style.setProperty("--logo-radius", `${radius}px`);
-  }, [size, radius]);
+    document.documentElement.style.setProperty(
+      "--label-date-gap",
+      `${dateGap}px`,
+    );
+  }, [size, radius, dateGap]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-work-style", workStyle);
@@ -72,6 +78,22 @@ export default function LogoControls() {
               className="w-full accent-primary"
             />
           </label>
+          <label className="flex flex-col gap-1 text-xs">
+            <div className="flex justify-between">
+              <span>Logo→date gap (timeline)</span>
+              <span className="tabular-nums text-muted-foreground">
+                {dateGap}px
+              </span>
+            </div>
+            <input
+              type="range"
+              min={-32}
+              max={64}
+              value={dateGap}
+              onChange={(e) => setDateGap(Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+          </label>
           <div className="flex flex-col gap-1.5 text-xs">
             <span>Work layout</span>
             <div className="flex rounded-md border overflow-hidden">
@@ -106,6 +128,7 @@ export default function LogoControls() {
             onClick={() => {
               setSize(DEFAULT_SIZE);
               setRadius(DEFAULT_RADIUS);
+              setDateGap(DEFAULT_DATE_GAP);
               setWorkStyle(DEFAULT_WORK_STYLE);
             }}
             className="text-xs text-muted-foreground hover:text-foreground self-start underline underline-offset-2"

@@ -3,12 +3,10 @@ import BlurFade from "@/components/magicui/blur-fade";
 import BlurFadeText from "@/components/magicui/blur-fade-text";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DATA } from "@/data/resume";
-import Link from "next/link";
 import Markdown from "react-markdown";
 import ContactSection from "@/components/section/contact-section";
 import ProjectsSection from "@/components/section/projects-section";
 import WorkSection from "@/components/section/work-section";
-import { ArrowUpRight } from "lucide-react";
 
 const BLUR_FADE_DELAY = 0.04;
 
@@ -72,29 +70,23 @@ export default function Page() {
           <div className="flex flex-col gap-8">
             {DATA.education.map((education, index) => (
               <BlurFade
-                key={education.school}
+                key={`${education.school}-${education.degree}`}
                 delay={BLUR_FADE_DELAY * 8 + index * 0.05}
               >
-                <Link
-                  href={education.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-x-3 justify-between group"
-                >
+                <div className="flex items-center gap-x-3 justify-between">
                   <div className="flex items-center gap-x-3 flex-1 min-w-0">
                     {education.logoUrl ? (
                       <img
                         src={education.logoUrl}
                         alt={education.school}
-                        className="size-8 md:size-10 p-1 border rounded-full shadow ring-2 ring-border overflow-hidden object-contain flex-none"
+                        className="size-12 md:size-14 border rounded-lg shadow ring-2 ring-border overflow-hidden object-contain flex-none bg-white"
                       />
                     ) : (
-                      <div className="size-8 md:size-10 p-1 border rounded-full shadow ring-2 ring-border bg-muted flex-none" />
+                      <div className="size-12 md:size-14 border rounded-lg shadow ring-2 ring-border bg-muted flex-none" />
                     )}
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                      <div className="font-semibold leading-none flex items-center gap-2">
+                      <div className="font-semibold leading-none">
                         {education.school}
-                        <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" aria-hidden />
                       </div>
                       <div className="font-sans text-sm text-muted-foreground">
                         {education.degree}
@@ -106,7 +98,7 @@ export default function Page() {
                       {education.start} - {education.end}
                     </span>
                   </div>
-                </Link>
+                </div>
               </BlurFade>
             ))}
           </div>

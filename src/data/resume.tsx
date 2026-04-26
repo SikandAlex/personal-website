@@ -131,6 +131,53 @@ export const DATA = {
       end: "2020",
     },
   ],
-  projects: [],
+  projects: [
+    {
+      title: "CallSaver",
+      href: "https://callsaver.ai",
+      dates: "Jan 2025 - Present",
+      active: true,
+      description:
+        "Voice AI platform for field service businesses — STT-LLM-TTS pipeline on LiveKit + Twilio that handles inbound calls, books appointments, and qualifies leads after hours. (placeholder copy — replace with real pitch)",
+      technologies: [
+        "TypeScript",
+        "Node.js",
+        "React",
+        "Next.js",
+        "AWS",
+        "Redis",
+        "Stripe",
+        "LiveKit",
+        "Twilio",
+      ],
+      links: [
+        {
+          type: "Website",
+          href: "https://callsaver.ai",
+          icon: <Icons.globe className="size-3" />,
+        },
+      ],
+      image: "",
+      video: "",
+    },
+    {
+      title: "StackPass",
+      href: "#",
+      dates: "2024",
+      active: true,
+      description:
+        "Placeholder — short pitch for StackPass goes here. Swap in the real description, dates, URL, and tags.",
+      technologies: ["TypeScript", "Next.js"],
+      links: [
+        {
+          type: "Website",
+          href: "#",
+          icon: <Icons.globe className="size-3" />,
+        },
+      ],
+      image: "",
+      video: "",
+    },
+  ],
   hackathons: [],
 } as const;

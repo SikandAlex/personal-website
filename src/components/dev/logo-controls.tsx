@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 const DEFAULT_SIZE = 80;
 const DEFAULT_RADIUS = 8;
-const DEFAULT_DATE_GAP = 8;
+const DEFAULT_DATE_GAP = -20;
 const DEFAULT_WORK_STYLE: WorkStyle = "accordion";
 
 type WorkStyle = "accordion" | "timeline";

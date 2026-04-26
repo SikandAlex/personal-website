@@ -9,7 +9,7 @@ const labelLogoStyle = {
 } as const;
 
 const dateGapStyle = {
-  marginTop: "var(--label-date-gap, 8px)",
+  marginTop: "var(--label-date-gap, -20px)",
 } as const;
 
 // Vertical offset that aligns the dot's center with the logo's center.

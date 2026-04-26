@@ -2,10 +2,6 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
-/* Dev toggle: switch the work section between accordion (default) and timeline. */
-.work-style-timeline { display: none; }
-:root[data-work-style="timeline"] .work-style-accordion { display: none; }
-:root[data-work-style="timeline"] .work-style-timeline { display: block; }
 
 @custom-variant dark (&:where(.dark, .dark *));
 

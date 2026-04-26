@@ -7,7 +7,6 @@ import Link from "next/link";
 import Markdown from "react-markdown";
 import ContactSection from "@/components/section/contact-section";
 import ProjectsSection from "@/components/section/projects-section";
-import WorkSection from "@/components/section/work-section";
 import WorkSectionTimeline from "@/components/section/work-section-timeline";
 import { ArrowUpRight, MapPin } from "lucide-react";
 
@@ -67,12 +66,7 @@ export default function Page() {
             <h2 className="text-xl font-bold">Work Experience</h2>
           </BlurFade>
           <BlurFade delay={BLUR_FADE_DELAY * 6}>
-            <div className="work-style-accordion">
-              <WorkSection />
-            </div>
-            <div className="work-style-timeline">
-              <WorkSectionTimeline />
-            </div>
+            <WorkSectionTimeline />
           </BlurFade>
         </div>
       </section>
@@ -95,8 +89,8 @@ export default function Page() {
                         alt={education.school}
                         className="object-contain flex-none"
                         style={{
-                          width: "var(--logo-size, 80px)",
-                          height: "var(--logo-size, 80px)",
+                          width: "var(--logo-size, 120px)",
+                          height: "var(--logo-size, 120px)",
                           borderRadius: "var(--logo-radius, 8px)",
                         }}
                       />
@@ -104,8 +98,8 @@ export default function Page() {
                       <div
                         className="bg-muted flex-none"
                         style={{
-                          width: "var(--logo-size, 80px)",
-                          height: "var(--logo-size, 80px)",
+                          width: "var(--logo-size, 120px)",
+                          height: "var(--logo-size, 120px)",
                           borderRadius: "var(--logo-radius, 8px)",
                         }}
                       />
@@ -154,8 +148,8 @@ export default function Page() {
                         alt={cert.issuer}
                         className="object-contain flex-none"
                         style={{
-                          width: "var(--logo-size, 80px)",
-                          height: "var(--logo-size, 80px)",
+                          width: "var(--logo-size, 120px)",
+                          height: "var(--logo-size, 120px)",
                           borderRadius: "var(--logo-radius, 8px)",
                         }}
                       />
@@ -163,8 +157,8 @@ export default function Page() {
                       <div
                         className="bg-muted flex-none"
                         style={{
-                          width: "var(--logo-size, 80px)",
-                          height: "var(--logo-size, 80px)",
+                          width: "var(--logo-size, 120px)",
+                          height: "var(--logo-size, 120px)",
                           borderRadius: "var(--logo-radius, 8px)",
                         }}
                       />

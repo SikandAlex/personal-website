@@ -3,8 +3,8 @@ import { DATA } from "@/data/resume";
 import Markdown from "react-markdown";
 
 const labelLogoStyle = {
-  width: "var(--logo-size, 80px)",
-  height: "var(--logo-size, 80px)",
+  width: "var(--logo-size, 120px)",
+  height: "var(--logo-size, 120px)",
   borderRadius: "var(--logo-radius, 8px)",
 } as const;
 
@@ -15,7 +15,7 @@ const dateGapStyle = {
 // Vertical offset that aligns the dot's center with the logo's center.
 // Logo center sits at (var(--logo-size) / 2) below the row top; dot container
 // is 24px tall so its own half is 12px.
-const DOT_OFFSET = "calc(var(--logo-size, 80px) / 2 - 12px)";
+const DOT_OFFSET = "calc(var(--logo-size, 120px) / 2 - 12px)";
 
 export default function WorkSectionTimeline() {
   return (

@@ -1,20 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
 
-const DEFAULT_SIZE = 80;
+const DEFAULT_SIZE = 120;
 const DEFAULT_RADIUS = 8;
 const DEFAULT_DATE_GAP = -20;
-const DEFAULT_WORK_STYLE: WorkStyle = "accordion";
-
-type WorkStyle = "accordion" | "timeline";
 
 export default function LogoControls() {
   const [size, setSize] = useState(DEFAULT_SIZE);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
   const [dateGap, setDateGap] = useState(DEFAULT_DATE_GAP);
-  const [workStyle, setWorkStyle] = useState<WorkStyle>(DEFAULT_WORK_STYLE);
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -25,10 +20,6 @@ export default function LogoControls() {
       `${dateGap}px`,
     );
   }, [size, radius, dateGap]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-work-style", workStyle);
-  }, [workStyle]);
 
   return (
     <div className="fixed bottom-24 right-4 z-50 w-64 rounded-xl border bg-card/95 p-3 shadow-lg backdrop-blur-sm text-foreground">
@@ -56,7 +47,7 @@ export default function LogoControls() {
             <input
               type="range"
               min={32}
-              max={160}
+              max={200}
               value={size}
               onChange={(e) => setSize(Number(e.target.value))}
               className="w-full accent-primary"
@@ -80,7 +71,7 @@ export default function LogoControls() {
           </label>
           <label className="flex flex-col gap-1 text-xs">
             <div className="flex justify-between">
-              <span>Logo→date gap (timeline)</span>
+              <span>Logo→date gap</span>
               <span className="tabular-nums text-muted-foreground">
                 {dateGap}px
               </span>
@@ -94,42 +85,12 @@ export default function LogoControls() {
               className="w-full accent-primary"
             />
           </label>
-          <div className="flex flex-col gap-1.5 text-xs">
-            <span>Work layout</span>
-            <div className="flex rounded-md border overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setWorkStyle("accordion")}
-                className={cn(
-                  "flex-1 px-2 py-1 text-xs transition-colors",
-                  workStyle === "accordion"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-background hover:bg-muted",
-                )}
-              >
-                Accordion
-              </button>
-              <button
-                type="button"
-                onClick={() => setWorkStyle("timeline")}
-                className={cn(
-                  "flex-1 px-2 py-1 text-xs transition-colors border-l",
-                  workStyle === "timeline"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-background hover:bg-muted",
-                )}
-              >
-                Timeline
-              </button>
-            </div>
-          </div>
           <button
             type="button"
             onClick={() => {
               setSize(DEFAULT_SIZE);
               setRadius(DEFAULT_RADIUS);
               setDateGap(DEFAULT_DATE_GAP);
-              setWorkStyle(DEFAULT_WORK_STYLE);
             }}
             className="text-xs text-muted-foreground hover:text-foreground self-start underline underline-offset-2"
           >

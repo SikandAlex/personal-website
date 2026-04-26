@@ -1,0 +1,32 @@
+import {
+  SiPytorch,
+  SiRedis,
+  SiMongodb,
+  SiTwilio,
+  SiGooglecloud,
+  SiLangchain,
+  SiDrizzle,
+} from "react-icons/si";
+import { FaAws } from "react-icons/fa";
+
+type IconProps = React.SVGProps<SVGSVGElement>;
+
+const colored = (
+  Icon: React.ComponentType<IconProps>,
+  color: string,
+) => {
+  const Wrapped = (props: IconProps) => (
+    <Icon {...props} style={{ color, ...(props.style ?? {}) }} />
+  );
+  Wrapped.displayName = `Colored(${(Icon as { displayName?: string; name?: string }).displayName ?? (Icon as { name?: string }).name ?? "Icon"})`;
+  return Wrapped;
+};
+
+export const PytorchIcon = colored(SiPytorch, "#EE4C2C");
+export const RedisIcon = colored(SiRedis, "#DC382D");
+export const MongoIcon = colored(SiMongodb, "#47A248");
+export const TwilioIcon = colored(SiTwilio, "#F22F46");
+export const AwsIcon = colored(FaAws, "#FF9900");
+export const GcpIcon = colored(SiGooglecloud, "#4285F4");
+export const DrizzleIcon = colored(SiDrizzle, "#C5F74F");
+export const LangchainIcon = SiLangchain;

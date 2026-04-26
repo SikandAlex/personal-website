@@ -3,10 +3,12 @@ import BlurFade from "@/components/magicui/blur-fade";
 import BlurFadeText from "@/components/magicui/blur-fade-text";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DATA } from "@/data/resume";
+import Link from "next/link";
 import Markdown from "react-markdown";
 import ContactSection from "@/components/section/contact-section";
 import ProjectsSection from "@/components/section/projects-section";
 import WorkSection from "@/components/section/work-section";
+import { ArrowUpRight } from "lucide-react";
 
 const BLUR_FADE_DELAY = 0.04;
 
@@ -111,6 +113,67 @@ export default function Page() {
                     </span>
                   </div>
                 </div>
+              </BlurFade>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section id="certifications">
+        <div className="flex min-h-0 flex-col gap-y-6">
+          <BlurFade delay={BLUR_FADE_DELAY * 8.5}>
+            <h2 className="text-xl font-bold">Certifications</h2>
+          </BlurFade>
+          <div className="flex flex-col gap-8">
+            {DATA.certifications.map((cert, index) => (
+              <BlurFade
+                key={cert.credentialId}
+                delay={BLUR_FADE_DELAY * 9 + index * 0.05}
+              >
+                <Link
+                  href={cert.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-x-3 justify-between group"
+                >
+                  <div className="flex items-center gap-x-3 flex-1 min-w-0">
+                    {cert.logoUrl ? (
+                      <img
+                        src={cert.logoUrl}
+                        alt={cert.issuer}
+                        className="object-contain flex-none"
+                        style={{
+                          width: "var(--logo-size, 80px)",
+                          height: "var(--logo-size, 80px)",
+                          borderRadius: "var(--logo-radius, 8px)",
+                        }}
+                      />
+                    ) : (
+                      <div
+                        className="bg-muted flex-none"
+                        style={{
+                          width: "var(--logo-size, 80px)",
+                          height: "var(--logo-size, 80px)",
+                          borderRadius: "var(--logo-radius, 8px)",
+                        }}
+                      />
+                    )}
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <div className="font-semibold leading-snug flex items-center gap-2">
+                        {cert.name}
+                        <ArrowUpRight
+                          className="h-3.5 w-3.5 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 flex-none"
+                          aria-hidden
+                        />
+                      </div>
+                      <div className="font-sans text-sm text-muted-foreground">
+                        {cert.issuer}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs tabular-nums text-muted-foreground text-right flex-none">
+                    <span>{cert.issued}</span>
+                  </div>
+                </Link>
               </BlurFade>
             ))}
           </div>

@@ -7,6 +7,17 @@ import { Nodejs } from "@/components/ui/svgs/nodejs";
 import { Python } from "@/components/ui/svgs/python";
 import { Postgresql } from "@/components/ui/svgs/postgresql";
 import { Docker } from "@/components/ui/svgs/docker";
+import {
+  PytorchIcon,
+  RedisIcon,
+  MongoIcon,
+  TwilioIcon,
+  AwsIcon,
+  GcpIcon,
+  DrizzleIcon,
+  LangchainIcon,
+} from "@/components/skill-icons";
+import { SiPrisma } from "react-icons/si";
 
 export const DATA = {
   name: "Alex Sikand",
@@ -20,25 +31,26 @@ export const DATA = {
     "Versatile Full-Stack Engineer who transforms complex technical challenges into scalable solutions. I've built production systems from research prototypes, modernized legacy enterprise codebases, and architected cloud infrastructure for high-traffic applications. I thrive in cross-functional environments where technical excellence meets business impact.",
   avatarUrl: "/alex-sikand.png",
   skills: [
-    { name: "AWS" },
-    { name: "GCP" },
+    { name: "AWS", icon: AwsIcon },
+    { name: "GCP", icon: GcpIcon },
     { name: "Docker", icon: Docker },
     { name: "TypeScript", icon: Typescript },
     { name: "React.js", icon: ReactLight },
     { name: "Next.js", icon: NextjsIconDark },
     { name: "Node.js", icon: Nodejs },
     { name: "Python", icon: Python },
-    { name: "Prisma" },
+    { name: "Prisma", icon: SiPrisma },
+    { name: "Drizzle", icon: DrizzleIcon },
     { name: "PostgreSQL", icon: Postgresql },
     { name: "Vector Databases" },
     { name: "DynamoDB" },
-    { name: "MongoDB" },
-    { name: "Redis" },
+    { name: "MongoDB", icon: MongoIcon },
+    { name: "Redis", icon: RedisIcon },
     { name: "BullMQ" },
-    { name: "Twilio" },
-    { name: "LangChain" },
+    { name: "Twilio", icon: TwilioIcon },
+    { name: "LangChain", icon: LangchainIcon },
     { name: "RAG" },
-    { name: "PyTorch" },
+    { name: "PyTorch", icon: PytorchIcon },
     { name: "Computer Vision" },
   ],
   navbar: [
@@ -137,6 +149,24 @@ export const DATA = {
       end: "2020",
     },
   ],
+  certifications: [
+    {
+      name: "Python and Statistics for Financial Analysis",
+      issuer: "The Hong Kong University of Science and Technology",
+      issued: "May 2020",
+      credentialId: "96BNGXH536RA",
+      href: "https://www.coursera.org/account/accomplishments/verify/96BNGXH536RA",
+      logoUrl: "/hkust.png",
+    },
+    {
+      name: "Finding Hidden Messages in DNA (Bioinformatics I)",
+      issuer: "Coursera Verified Certificates",
+      issued: "Jul 2015",
+      credentialId: "TBTFFGBSF9",
+      href: "https://www.coursera.org/account/accomplishments/verify/TBTFFGBSF9",
+      logoUrl: "/coursera.png",
+    },
+  ],
   projects: [
     {
       title: "CallSaver",
@@ -144,7 +174,7 @@ export const DATA = {
       dates: "Jan 2025 - Present",
       active: true,
       description:
-        "Voice AI platform for field service businesses — STT-LLM-TTS pipeline on LiveKit + Twilio that handles inbound calls, books appointments, and qualifies leads after hours. (placeholder copy — replace with real pitch)",
+        "Every missed call costs you money. Our AI Receptionist answers instantly, books jobs 24/7, and earns you thousands in lost revenue.",
       technologies: [
         "TypeScript",
         "Node.js",
@@ -163,21 +193,29 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image: "",
+      image:
+        "https://callsaver-demo-videos.s3.us-west-1.amazonaws.com/hero-videos/og/og-general.jpg",
       video: "",
     },
     {
       title: "StackPass",
-      href: "#",
-      dates: "2024",
+      href: "https://getstackpass.com",
+      dates: "2026",
       active: true,
       description:
-        "Placeholder — short pitch for StackPass goes here. Swap in the real description, dates, URL, and tags.",
-      technologies: ["TypeScript", "Next.js"],
+        "A VIP Discord lounge for your paying Substack subscribers. Connect Stripe once and StackPass grants a Discord role the moment a reader subscribes — and removes it the moment they cancel.",
+      technologies: [
+        "TypeScript",
+        "Next.js",
+        "Drizzle",
+        "PostgreSQL",
+        "Stripe",
+        "Discord",
+      ],
       links: [
         {
           type: "Website",
-          href: "#",
+          href: "https://getstackpass.com",
           icon: <Icons.globe className="size-3" />,
         },
       ],

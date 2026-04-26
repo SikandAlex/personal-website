@@ -1,42 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-"use client";
-
-import { useState } from "react";
 import { DATA } from "@/data/resume";
 import Markdown from "react-markdown";
 
-const MARKER_SIZE = 48;
-const LABEL_LOGO_SIZE = 40;
-
-function MarkerLogo({ src, alt }: { src: string; alt: string }) {
-  const [imageError, setImageError] = useState(false);
-
-  const sizingStyle = {
-    width: `${MARKER_SIZE}px`,
-    height: `${MARKER_SIZE}px`,
-  } as const;
-
-  if (!src || imageError) {
-    return (
-      <span
-        className="bg-primary/20 flex items-center justify-center rounded-full"
-        style={sizingStyle}
-      >
-        <span className="bg-primary size-3 rounded-full" />
-      </span>
-    );
-  }
-
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className="rounded-md object-contain"
-      style={sizingStyle}
-      onError={() => setImageError(true)}
-    />
-  );
-}
+const labelLogoStyle = {
+  width: "var(--logo-size, 80px)",
+  height: "var(--logo-size, 80px)",
+  borderRadius: "var(--logo-radius, 8px)",
+} as const;
 
 export default function WorkSectionTimeline() {
   return (
@@ -51,23 +21,19 @@ export default function WorkSectionTimeline() {
               src={work.logoUrl}
               alt={work.company}
               className="object-contain"
-              style={{
-                width: `${LABEL_LOGO_SIZE}px`,
-                height: `${LABEL_LOGO_SIZE}px`,
-              }}
+              style={labelLogoStyle}
             />
             <div className="text-muted-foreground text-right text-xs font-medium tabular-nums">
               {work.start} - {work.end ?? "Present"}
             </div>
           </div>
           <div className="flex flex-col items-center">
-            <div
-              className="sticky top-4 flex shrink-0 items-center justify-center"
-              style={{ width: MARKER_SIZE, height: MARKER_SIZE }}
-            >
-              <MarkerLogo src={work.logoUrl} alt={work.company} />
+            <div className="sticky top-4 flex size-6 items-center justify-center">
+              <span className="bg-primary/20 flex size-[18px] shrink-0 items-center justify-center rounded-full">
+                <span className="bg-primary size-3 rounded-full" />
+              </span>
             </div>
-            <span className="w-px flex-1 border mt-1" />
+            <span className="-mt-2.5 w-px flex-1 border" />
           </div>
           <div className="flex flex-1 flex-col gap-3 pb-8 pl-3 md:pl-6">
             <div className="flex flex-col gap-2 md:hidden">
@@ -75,10 +41,7 @@ export default function WorkSectionTimeline() {
                 src={work.logoUrl}
                 alt={work.company}
                 className="object-contain"
-                style={{
-                  width: `${LABEL_LOGO_SIZE}px`,
-                  height: `${LABEL_LOGO_SIZE}px`,
-                }}
+                style={labelLogoStyle}
               />
               <div className="font-medium text-xs tabular-nums">
                 {work.start} - {work.end ?? "Present"}

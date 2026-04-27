@@ -15,7 +15,14 @@ const dateGapStyle = {
   marginTop: "var(--label-date-gap, 16px)",
 } as const;
 
-const ALL_SKILL_ITEMS = DATA.skillGroups.flatMap((g) => g.items);
+type SkillItem = {
+  name: string;
+  icon?: React.ComponentType<{ className?: string }>;
+};
+
+const ALL_SKILL_ITEMS: readonly SkillItem[] = DATA.skillGroups.flatMap(
+  (g) => g.items as readonly SkillItem[],
+);
 const findSkill = (name: string) =>
   ALL_SKILL_ITEMS.find((s) => s.name === name);
 

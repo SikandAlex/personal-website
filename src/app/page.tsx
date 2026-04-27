@@ -8,7 +8,7 @@ import Markdown from "react-markdown";
 import ContactSection from "@/components/section/contact-section";
 import ProjectsSection from "@/components/section/projects-section";
 import WorkSectionTimeline from "@/components/section/work-section-timeline";
-import GitHubActivity from "@/components/section/github-activity";
+// import GitHubActivity from "@/components/section/github-activity"; // hidden until contribution count is fuller
 import { ArrowUpRight, MapPin } from "lucide-react";
 
 const BLUR_FADE_DELAY = 0.04;
@@ -231,6 +231,8 @@ export default function Page() {
           </div>
         </div>
       </section>
+      {/* GitHub Activity section hidden until contribution count is fuller —
+          re-enable by uncommenting this block and the import above.
       <section id="github-activity">
         <div className="flex min-h-0 flex-col gap-y-4">
           <BlurFade delay={BLUR_FADE_DELAY * 10.5}>
@@ -241,6 +243,7 @@ export default function Page() {
           </BlurFade>
         </div>
       </section>
+      */}
       <section id="projects">
         <BlurFade delay={BLUR_FADE_DELAY * 11}>
           <ProjectsSection />

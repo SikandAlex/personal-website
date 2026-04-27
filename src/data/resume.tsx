@@ -30,6 +30,8 @@ import {
   MuiIcon,
   ShadcnIcon,
   TailwindIcon,
+  ZodIcon,
+  OpenapiIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -45,35 +47,10 @@ export const DATA = {
   avatarUrl: "/alex-sikand.png",
   skillGroups: [
     {
-      name: "AI / ML",
-      items: [
-        { name: "OpenAI", icon: OpenaiIcon },
-        { name: "Claude", icon: ClaudeIcon },
-        { name: "MCP", icon: McpIcon },
-        { name: "PyTorch", icon: PytorchIcon },
-        { name: "LangChain", icon: LangchainIcon },
-        { name: "Triton Inference Server", icon: NvidiaIcon },
-        { name: "TensorRT", icon: NvidiaIcon },
-        { name: "Weights & Biases", icon: WandbIcon },
-        { name: "LiveKit", icon: LivekitIcon },
-        { name: "RAG" },
-        { name: "Computer Vision" },
-      ],
-    },
-    {
       name: "Languages",
       items: [
         { name: "TypeScript", icon: Typescript },
         { name: "Python", icon: Python },
-      ],
-    },
-    {
-      name: "Backend & APIs",
-      items: [
-        { name: "Node.js", icon: Nodejs },
-        { name: "Express", icon: ExpressIcon },
-        { name: "BullMQ", icon: BullmqIcon },
-        { name: "Twilio", icon: TwilioIcon },
       ],
     },
     {
@@ -82,6 +59,28 @@ export const DATA = {
         { name: "AWS", icon: AwsIcon },
         { name: "GCP", icon: GcpIcon },
         { name: "Docker", icon: Docker },
+      ],
+    },
+    {
+      name: "Backend & APIs",
+      items: [
+        { name: "Node.js", icon: Nodejs },
+        { name: "Express", icon: ExpressIcon },
+        { name: "Zod", icon: ZodIcon },
+        { name: "OpenAPI", icon: OpenapiIcon },
+        { name: "BullMQ", icon: BullmqIcon },
+        { name: "Twilio", icon: TwilioIcon },
+      ],
+    },
+    {
+      name: "Frontend",
+      items: [
+        { name: "React.js", icon: ReactLight },
+        { name: "Next.js", icon: NextjsIconDark },
+        { name: "Zustand", icon: ZustandIcon },
+        { name: "Tailwind CSS", icon: TailwindIcon },
+        { name: "shadcn/ui", icon: ShadcnIcon },
+        { name: "Material UI", icon: MuiIcon },
       ],
     },
     {
@@ -98,14 +97,19 @@ export const DATA = {
       ],
     },
     {
-      name: "Frontend",
+      name: "AI / ML",
       items: [
-        { name: "React.js", icon: ReactLight },
-        { name: "Next.js", icon: NextjsIconDark },
-        { name: "Zustand", icon: ZustandIcon },
-        { name: "Tailwind CSS", icon: TailwindIcon },
-        { name: "shadcn/ui", icon: ShadcnIcon },
-        { name: "Material UI", icon: MuiIcon },
+        { name: "OpenAI", icon: OpenaiIcon },
+        { name: "Claude", icon: ClaudeIcon },
+        { name: "MCP", icon: McpIcon },
+        { name: "PyTorch", icon: PytorchIcon },
+        { name: "LangChain", icon: LangchainIcon },
+        { name: "Triton Inference Server", icon: NvidiaIcon },
+        { name: "TensorRT", icon: NvidiaIcon },
+        { name: "Weights & Biases", icon: WandbIcon },
+        { name: "LiveKit", icon: LivekitIcon },
+        { name: "RAG" },
+        { name: "Computer Vision" },
       ],
     },
   ],
@@ -152,6 +156,7 @@ export const DATA = {
         "TypeScript",
         "Node.js",
         "Express",
+        "Zod",
         "React.js",
         "Next.js",
         "AWS",
@@ -197,7 +202,7 @@ export const DATA = {
       logoUrl: "/pivotal.png",
       start: "Jul 2022",
       end: "Jun 2023",
-      skills: ["Python", "React.js", "TypeScript", "Material UI"],
+      skills: ["Python", "React.js", "TypeScript", "Material UI", "OpenAPI"],
       description:
         "- Developed Python Django backend infrastructure for processing big data files from eVTOL aircraft telemetry, handling long-running processing jobs for flight data analysis.\n- Refactored 30+ MaterialUI components from v0 to v3 and converted React class components to functional hooks by hand, programmatically generated a proof-of-concept OpenAPI OAS3 schema for over 400+ API methods.",
     },

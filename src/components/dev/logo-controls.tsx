@@ -1,22 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  usePreview,
-  type HeroStyle,
-} from "@/components/dev/preview-context";
+import { usePreview } from "@/components/dev/preview-context";
 
 const DEFAULT_SIZE = 120;
 const DEFAULT_RADIUS = 0;
 const DEFAULT_DATE_GAP = 16;
 const DEFAULT_ACCENT = "#7C3AED";
-
-const HERO_STYLES: { id: HeroStyle; label: string }[] = [
-  { id: "default", label: "default" },
-  { id: "line-shadow", label: "line-shadow" },
-  { id: "aurora", label: "aurora" },
-  { id: "typing", label: "typing" },
-];
 
 export default function LogoControls() {
   const [size, setSize] = useState(DEFAULT_SIZE);
@@ -24,12 +14,7 @@ export default function LogoControls() {
   const [dateGap, setDateGap] = useState(DEFAULT_DATE_GAP);
   const [collapsed, setCollapsed] = useState(false);
 
-  const {
-    heroStyle,
-    setHeroStyle,
-    accent,
-    setAccent,
-  } = usePreview();
+  const { accent, setAccent } = usePreview();
 
   useEffect(() => {
     document.documentElement.style.setProperty("--logo-size", `${size}px`);
@@ -104,28 +89,9 @@ export default function LogoControls() {
               className="w-full accent-primary"
             />
           </label>
-          <div className="flex flex-col gap-1.5 text-xs">
-            <span>Hero text style</span>
-            <div className="grid grid-cols-2 gap-1">
-              {HERO_STYLES.map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setHeroStyle(opt.id)}
-                  className={`px-2 py-1 text-xs rounded border transition-colors ${
-                    heroStyle === opt.id
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background hover:bg-muted"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
           <label className="flex flex-col gap-1 text-xs">
             <div className="flex justify-between">
-              <span>Accent color</span>
+              <span>Particles color</span>
               <span className="tabular-nums text-muted-foreground">
                 {accent}
               </span>
@@ -143,7 +109,6 @@ export default function LogoControls() {
               setSize(DEFAULT_SIZE);
               setRadius(DEFAULT_RADIUS);
               setDateGap(DEFAULT_DATE_GAP);
-              setHeroStyle("default");
               setAccent(DEFAULT_ACCENT);
             }}
             className="text-xs text-muted-foreground hover:text-foreground self-start underline underline-offset-2"

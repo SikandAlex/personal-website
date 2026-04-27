@@ -3,26 +3,13 @@
 import { useEffect, useState } from "react";
 import {
   usePreview,
-  type CardStyle,
   type HeroStyle,
 } from "@/components/dev/preview-context";
 
 const DEFAULT_SIZE = 120;
 const DEFAULT_RADIUS = 0;
 const DEFAULT_DATE_GAP = 16;
-const DEFAULT_COURSEWORK_LAYOUT: CourseworkLayout = "pills";
 const DEFAULT_ACCENT = "#7C3AED";
-
-type CourseworkLayout = "pills" | "list" | "two-col";
-
-const CARD_STYLES: { id: CardStyle; label: string }[] = [
-  { id: "default", label: "default" },
-  { id: "particles", label: "particles" },
-  { id: "noise", label: "noise" },
-  { id: "shine", label: "shine" },
-  { id: "glare", label: "glare" },
-  { id: "magic", label: "magic" },
-];
 
 const HERO_STYLES: { id: HeroStyle; label: string }[] = [
   { id: "default", label: "default" },
@@ -35,14 +22,9 @@ export default function LogoControls() {
   const [size, setSize] = useState(DEFAULT_SIZE);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
   const [dateGap, setDateGap] = useState(DEFAULT_DATE_GAP);
-  const [courseworkLayout, setCourseworkLayout] = useState<CourseworkLayout>(
-    DEFAULT_COURSEWORK_LAYOUT,
-  );
   const [collapsed, setCollapsed] = useState(false);
 
   const {
-    cardStyle,
-    setCardStyle,
     heroStyle,
     setHeroStyle,
     accent,
@@ -57,13 +39,6 @@ export default function LogoControls() {
       `${dateGap}px`,
     );
   }, [size, radius, dateGap]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute(
-      "data-coursework-layout",
-      courseworkLayout,
-    );
-  }, [courseworkLayout]);
 
   return (
     <div className="fixed bottom-24 right-4 z-50 w-72 max-h-[80vh] overflow-y-auto rounded-xl border bg-card/95 p-3 shadow-lg backdrop-blur-sm text-foreground">
@@ -130,48 +105,6 @@ export default function LogoControls() {
             />
           </label>
           <div className="flex flex-col gap-1.5 text-xs">
-            <span>Coursework layout</span>
-            <div className="flex rounded-md border overflow-hidden">
-              {(["pills", "list", "two-col"] as CourseworkLayout[]).map(
-                (opt, i) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => setCourseworkLayout(opt)}
-                    className={`flex-1 px-2 py-1 text-xs transition-colors ${
-                      i > 0 ? "border-l" : ""
-                    } ${
-                      courseworkLayout === opt
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-background hover:bg-muted"
-                    }`}
-                  >
-                    {opt === "two-col" ? "2-col" : opt}
-                  </button>
-                ),
-              )}
-            </div>
-          </div>
-          <div className="flex flex-col gap-1.5 text-xs">
-            <span>Project card style</span>
-            <div className="grid grid-cols-3 gap-1">
-              {CARD_STYLES.map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setCardStyle(opt.id)}
-                  className={`px-2 py-1 text-xs rounded border transition-colors ${
-                    cardStyle === opt.id
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background hover:bg-muted"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-1.5 text-xs">
             <span>Hero text style</span>
             <div className="grid grid-cols-2 gap-1">
               {HERO_STYLES.map((opt) => (
@@ -210,8 +143,6 @@ export default function LogoControls() {
               setSize(DEFAULT_SIZE);
               setRadius(DEFAULT_RADIUS);
               setDateGap(DEFAULT_DATE_GAP);
-              setCourseworkLayout(DEFAULT_COURSEWORK_LAYOUT);
-              setCardStyle("default");
               setHeroStyle("default");
               setAccent(DEFAULT_ACCENT);
             }}

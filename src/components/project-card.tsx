@@ -9,84 +9,30 @@ import { useState } from "react";
 import Markdown from "react-markdown";
 import { usePreview } from "@/components/dev/preview-context";
 import { Particles } from "@/components/ui/particles";
-import { ShineBorder } from "@/components/ui/shine-border";
-import { MagicCard } from "@/components/ui/magic-card";
-import { GlareHover } from "@/components/ui/glare-hover";
-import { NoiseTexture } from "@/components/ui/noise-texture";
 
 function ProjectImage({ src, alt }: { src: string; alt: string }) {
   const [imageError, setImageError] = useState(false);
-  const { cardStyle, accent } = usePreview();
+  const { accent } = usePreview();
 
   if (!src || imageError) {
     return <div className="w-full h-48 bg-muted" />;
   }
 
-  const logo = (
-    <img
-      src={src}
-      alt={alt}
-      className="max-w-full max-h-full object-contain relative z-10"
-      onError={() => setImageError(true)}
-    />
-  );
-
-  // Wrapper-style effects (whole image area gets the effect applied)
-  if (cardStyle === "glare") {
-    return (
-      <GlareHover
-        width="100%"
-        height="12rem"
-        background="oklch(0.97 0 0)"
-        color={accent as `#${string}`}
-        className="border-b border-border flex items-center justify-center p-8"
-      >
-        {logo}
-      </GlareHover>
-    );
-  }
-
-  if (cardStyle === "magic") {
-    return (
-      <MagicCard
-        gradientFrom={accent}
-        gradientTo="#0070F3"
-        gradientSize={200}
-        className="w-full h-48 flex items-center justify-center p-8 border-b border-border rounded-none"
-      >
-        {logo}
-      </MagicCard>
-    );
-  }
-
-  // Background-overlay effects (image area + decorative bg)
   return (
     <div className="relative w-full h-48 bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center p-8 border-b border-border overflow-hidden">
-      {cardStyle === "particles" && (
-        <Particles
-          className="absolute inset-0"
-          quantity={60}
-          color={accent}
-          ease={80}
-          refresh
-        />
-      )}
-      {cardStyle === "noise" && (
-        <NoiseTexture
-          className="absolute inset-0 w-full h-full"
-          frequency={0.7}
-          noiseOpacity={0.4}
-        />
-      )}
-      {cardStyle === "shine" && (
-        <ShineBorder
-          borderWidth={2}
-          duration={10}
-          shineColor={[accent, "#0070F3", accent]}
-          className="rounded-none"
-        />
-      )}
-      {logo}
+      <Particles
+        className="absolute inset-0"
+        quantity={60}
+        color={accent}
+        ease={80}
+        refresh
+      />
+      <img
+        src={src}
+        alt={alt}
+        className="max-w-full max-h-full object-contain relative z-10"
+        onError={() => setImageError(true)}
+      />
     </div>
   );
 }

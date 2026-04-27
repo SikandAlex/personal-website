@@ -131,11 +131,11 @@ export default function Page() {
             <h2 className="text-xl font-bold">Relevant Coursework</h2>
           </BlurFade>
           <BlurFade delay={BLUR_FADE_DELAY * 8.3}>
-            <div className="coursework-list flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {DATA.courses.map((course) => (
                 <span
                   key={`${course.code}-${course.name}`}
-                  className="coursework-item border border-border rounded-md px-3 py-1 text-xs flex items-center gap-1.5"
+                  className="border border-border rounded-md px-3 py-1 text-xs flex items-center gap-1.5"
                 >
                   <span className="font-semibold tabular-nums">
                     {course.code}

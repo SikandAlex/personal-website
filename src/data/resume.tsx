@@ -36,6 +36,7 @@ import {
   LangfuseIcon,
   SentryIcon,
   IntercomIcon,
+  ViteIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -84,6 +85,7 @@ export const DATA = {
       items: [
         { name: "React.js", icon: ReactLight },
         { name: "Next.js", icon: NextjsIconDark },
+        { name: "Vite", icon: ViteIcon },
         { name: "Zustand", icon: ZustandIcon },
         { name: "Tailwind CSS", icon: TailwindIcon },
         { name: "shadcn/ui", icon: ShadcnIcon },
@@ -168,7 +170,7 @@ export const DATA = {
         "OpenTelemetry",
         "Sentry",
         "React.js",
-        "Next.js",
+        "Vite",
         "AWS",
         "GCP",
         "Redis",

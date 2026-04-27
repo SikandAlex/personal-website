@@ -12,6 +12,7 @@ import {
   SiOpenai,
   SiClaude,
   SiModelcontextprotocol,
+  SiExpress,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 
@@ -42,6 +43,7 @@ export const LivekitIcon = colored(SiLivekit, "#06B6D4");
 export const OpenaiIcon = colored(SiOpenai, "#10A37F");
 export const ClaudeIcon = colored(SiClaude, "#D97757");
 export const McpIcon = SiModelcontextprotocol;
+export const ExpressIcon = SiExpress;
 
 // Static-asset-backed icons (no maintained icon set carries these)
 type ImgProps = { className?: string };

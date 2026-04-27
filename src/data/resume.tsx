@@ -26,6 +26,7 @@ import {
   OpenaiIcon,
   ClaudeIcon,
   McpIcon,
+  ExpressIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -59,6 +60,7 @@ export const DATA = {
       name: "Backend & APIs",
       items: [
         { name: "Node.js", icon: Nodejs },
+        { name: "Express", icon: ExpressIcon },
         { name: "Twilio", icon: TwilioIcon },
         { name: "BullMQ", icon: BullmqIcon },
       ],

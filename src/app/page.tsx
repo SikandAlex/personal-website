@@ -124,6 +124,28 @@ export default function Page() {
           </div>
         </div>
       </section>
+      <section id="coursework">
+        <div className="flex min-h-0 flex-col gap-y-4">
+          <BlurFade delay={BLUR_FADE_DELAY * 8.2}>
+            <h2 className="text-xl font-bold">Relevant Coursework</h2>
+          </BlurFade>
+          <BlurFade delay={BLUR_FADE_DELAY * 8.3}>
+            <div className="flex flex-wrap gap-2">
+              {DATA.courses.map((course) => (
+                <span
+                  key={`${course.code}-${course.name}`}
+                  className="border border-border rounded-md px-3 py-1 text-xs flex items-center gap-1.5"
+                >
+                  <span className="font-semibold tabular-nums">
+                    {course.code}
+                  </span>
+                  <span className="text-muted-foreground">{course.name}</span>
+                </span>
+              ))}
+            </div>
+          </BlurFade>
+        </div>
+      </section>
       <section id="certifications">
         <div className="flex min-h-0 flex-col gap-y-6">
           <BlurFade delay={BLUR_FADE_DELAY * 8.5}>
@@ -178,14 +200,32 @@ export default function Page() {
           <BlurFade delay={BLUR_FADE_DELAY * 9}>
             <h2 className="text-xl font-bold">Skills</h2>
           </BlurFade>
-          <div className="flex flex-wrap gap-2">
-            {DATA.skills.map((skill, id) => (
-              <BlurFade key={skill.name} delay={BLUR_FADE_DELAY * 10 + id * 0.05}>
-                <div className="border bg-background border-border ring-2 ring-border/20 rounded-xl h-8 w-fit px-4 flex items-center gap-2">
-                  {"icon" in skill && skill.icon && <skill.icon className="size-4 rounded overflow-hidden object-contain" />}
-                  <span className="text-foreground text-sm font-medium">{skill.name}</span>
+          <div className="flex flex-col gap-5">
+            {DATA.skillGroups.map((group, gi) => (
+              <div key={group.name} className="flex flex-col gap-2">
+                <BlurFade delay={BLUR_FADE_DELAY * 10 + gi * 0.05}>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {group.name}
+                  </h3>
+                </BlurFade>
+                <div className="flex flex-wrap gap-2">
+                  {group.items.map((skill, id) => (
+                    <BlurFade
+                      key={skill.name}
+                      delay={BLUR_FADE_DELAY * 10 + gi * 0.05 + id * 0.02}
+                    >
+                      <div className="border bg-background border-border ring-2 ring-border/20 rounded-xl h-8 w-fit px-4 flex items-center gap-2">
+                        {"icon" in skill && skill.icon && (
+                          <skill.icon className="size-4 rounded overflow-hidden object-contain" />
+                        )}
+                        <span className="text-foreground text-sm font-medium">
+                          {skill.name}
+                        </span>
+                      </div>
+                    </BlurFade>
+                  ))}
                 </div>
-              </BlurFade>
+              </div>
             ))}
           </div>
         </div>

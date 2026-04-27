@@ -24,21 +24,12 @@ export default function ContactSection() {
           Get in Touch
         </h2>
         <p className="mx-auto max-w-lg text-muted-foreground text-balance">
-          Want to chat? Send me an email at{" "}
+          Want to chat? Reach out to {DATA.name.split(" ")[0]} at{" "}
           <Link
             href={`mailto:${DATA.contact.email}`}
             className="text-blue-500 hover:underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
           >
             {DATA.contact.email}
-          </Link>{" "}
-          or reach out on{" "}
-          <Link
-            href={DATA.contact.social.GitHub.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
-          >
-            GitHub
           </Link>
           . I&apos;ll respond whenever I can.
         </p>

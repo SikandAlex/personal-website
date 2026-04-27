@@ -29,28 +29,58 @@ export const DATA = {
   summary:
     "Versatile Full-Stack Engineer who transforms complex technical challenges into scalable solutions. I've built production systems from research prototypes, modernized legacy enterprise codebases, and architected cloud infrastructure for high-traffic applications. I thrive in cross-functional environments where technical excellence meets business impact.",
   avatarUrl: "/alex-sikand.png",
-  skills: [
-    { name: "AWS", icon: AwsIcon },
-    { name: "GCP", icon: GcpIcon },
-    { name: "Docker", icon: Docker },
-    { name: "TypeScript", icon: Typescript },
-    { name: "React.js", icon: ReactLight },
-    { name: "Next.js", icon: NextjsIconDark },
-    { name: "Node.js", icon: Nodejs },
-    { name: "Python", icon: Python },
-    { name: "Prisma", icon: SiPrisma },
-    { name: "Drizzle", icon: DrizzleIcon },
-    { name: "PostgreSQL", icon: Postgresql },
-    { name: "Vector Databases" },
-    { name: "DynamoDB" },
-    { name: "MongoDB", icon: MongoIcon },
-    { name: "Redis", icon: RedisIcon },
-    { name: "BullMQ" },
-    { name: "Twilio", icon: TwilioIcon },
-    { name: "LangChain", icon: LangchainIcon },
-    { name: "RAG" },
-    { name: "PyTorch", icon: PytorchIcon },
-    { name: "Computer Vision" },
+  skillGroups: [
+    {
+      name: "Languages",
+      items: [
+        { name: "TypeScript", icon: Typescript },
+        { name: "Python", icon: Python },
+      ],
+    },
+    {
+      name: "Frontend",
+      items: [
+        { name: "React.js", icon: ReactLight },
+        { name: "Next.js", icon: NextjsIconDark },
+      ],
+    },
+    {
+      name: "Backend & APIs",
+      items: [
+        { name: "Node.js", icon: Nodejs },
+        { name: "Twilio", icon: TwilioIcon },
+        { name: "BullMQ" },
+      ],
+    },
+    {
+      name: "Cloud & Infrastructure",
+      items: [
+        { name: "AWS", icon: AwsIcon },
+        { name: "GCP", icon: GcpIcon },
+        { name: "Docker", icon: Docker },
+      ],
+    },
+    {
+      name: "Databases & ORMs",
+      items: [
+        { name: "PostgreSQL", icon: Postgresql },
+        { name: "MongoDB", icon: MongoIcon },
+        { name: "DynamoDB" },
+        { name: "Vector Databases" },
+        { name: "Redis", icon: RedisIcon },
+        { name: "Prisma", icon: SiPrisma },
+        { name: "Drizzle", icon: DrizzleIcon },
+      ],
+    },
+    {
+      name: "AI / ML",
+      items: [
+        { name: "PyTorch", icon: PytorchIcon },
+        { name: "LangChain", icon: LangchainIcon },
+        { name: "RAG" },
+        { name: "Computer Vision" },
+      ],
+    },
   ],
   navbar: [
     { href: "/", icon: HomeIcon, label: "Home" },
@@ -146,6 +176,58 @@ export const DATA = {
       logoUrl: "/boston-university.png",
       start: "2016",
       end: "2020",
+    },
+  ],
+  courses: [
+    {
+      code: "CS 400",
+      name: "Full Stack App Development",
+      school: "Boston University",
+    },
+    {
+      code: "CS 411",
+      name: "Software Engineering",
+      school: "Boston University",
+    },
+    {
+      code: "CS 440",
+      name: "Artificial Intelligence",
+      school: "Boston University",
+    },
+    {
+      code: "CS 542",
+      name: "Machine Learning",
+      school: "Boston University",
+    },
+    {
+      code: "CS 565",
+      name: "Algorithmic Data Mining",
+      school: "Boston University",
+    },
+    {
+      code: "CS 591",
+      name: "Deep Learning",
+      school: "Boston University",
+    },
+    {
+      code: "CS 591",
+      name: "Parallel Computing",
+      school: "Boston University",
+    },
+    {
+      code: "CS 591",
+      name: "User Centric Systems for Data Science",
+      school: "Boston University",
+    },
+    {
+      code: "CS 660",
+      name: "Graduate Databases",
+      school: "Boston University",
+    },
+    {
+      code: "MA 225",
+      name: "Multivariate Calculus",
+      school: "Boston University",
     },
   ],
   certifications: [

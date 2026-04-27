@@ -167,7 +167,7 @@ export const DATA = {
       degree: "M.S. Artificial Intelligence",
       logoUrl: "/boston-university.png",
       start: "2020",
-      end: "2022",
+      end: "2021",
     },
     {
       school: "Boston University",

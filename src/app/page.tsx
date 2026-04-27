@@ -91,7 +91,7 @@ export default function Page() {
                         style={{
                           width: "var(--logo-size, 120px)",
                           height: "var(--logo-size, 120px)",
-                          borderRadius: "var(--logo-radius, 8px)",
+                          borderRadius: "var(--logo-radius, 0px)",
                         }}
                       />
                     ) : (
@@ -100,7 +100,7 @@ export default function Page() {
                         style={{
                           width: "var(--logo-size, 120px)",
                           height: "var(--logo-size, 120px)",
-                          borderRadius: "var(--logo-radius, 8px)",
+                          borderRadius: "var(--logo-radius, 0px)",
                         }}
                       />
                     )}

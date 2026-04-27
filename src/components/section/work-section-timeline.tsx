@@ -5,7 +5,7 @@ import Markdown from "react-markdown";
 const labelLogoStyle = {
   width: "var(--logo-size, 120px)",
   height: "auto",
-  borderRadius: "var(--logo-radius, 8px)",
+  borderRadius: "var(--logo-radius, 0px)",
 } as const;
 
 const dateGapStyle = {

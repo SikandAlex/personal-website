@@ -22,6 +22,7 @@ import {
   SiSentry,
   SiIntercom,
   SiVite,
+  SiJupyter,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 
@@ -62,6 +63,7 @@ export const OpentelemetryIcon = colored(SiOpentelemetry, "#F5A800");
 export const SentryIcon = colored(SiSentry, "#362D59");
 export const IntercomIcon = colored(SiIntercom, "#1F8DED");
 export const ViteIcon = colored(SiVite, "#646CFF");
+export const JupyterIcon = colored(SiJupyter, "#F37626");
 
 export const LangfuseIcon = ({ className }: ImgProps) => (
   // eslint-disable-next-line @next/next/no-img-element

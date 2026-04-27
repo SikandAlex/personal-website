@@ -37,6 +37,7 @@ import {
   SentryIcon,
   IntercomIcon,
   ViteIcon,
+  JupyterIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -112,6 +113,7 @@ export const DATA = {
         { name: "Claude", icon: ClaudeIcon },
         { name: "MCP", icon: McpIcon },
         { name: "PyTorch", icon: PytorchIcon },
+        { name: "Jupyter", icon: JupyterIcon },
         { name: "LangChain", icon: LangchainIcon },
         { name: "Triton Inference Server", icon: NvidiaIcon },
         { name: "TensorRT", icon: NvidiaIcon },
@@ -233,6 +235,7 @@ export const DATA = {
       skills: [
         "Python",
         "PyTorch",
+        "Jupyter",
         "Computer Vision",
         "Triton Inference Server",
         "TensorRT",

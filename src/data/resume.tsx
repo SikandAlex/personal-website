@@ -18,6 +18,7 @@ import {
   LangchainIcon,
   DynamoIcon,
   BullmqIcon,
+  ZustandIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -44,6 +45,7 @@ export const DATA = {
       items: [
         { name: "React.js", icon: ReactLight },
         { name: "Next.js", icon: NextjsIconDark },
+        { name: "Zustand", icon: ZustandIcon },
       ],
     },
     {

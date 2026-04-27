@@ -43,3 +43,8 @@ export const BullmqIcon = ({ className }: ImgProps) => (
   // eslint-disable-next-line @next/next/no-img-element
   <img src="/bullmq.png" alt="BullMQ" className={className} />
 );
+
+export const ZustandIcon = ({ className }: ImgProps) => (
+  // eslint-disable-next-line @next/next/no-img-element
+  <img src="/zustand.svg" alt="Zustand" className={className} />
+);

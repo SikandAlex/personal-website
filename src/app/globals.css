@@ -2,6 +2,23 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
+/* Dev toggle: switch the coursework section between pills (default), single
+   vertical list, and two-column grid. */
+:root[data-coursework-layout="list"] .coursework-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+:root[data-coursework-layout="two-col"] .coursework-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+:root[data-coursework-layout="list"] .coursework-list > .coursework-item,
+:root[data-coursework-layout="two-col"] .coursework-list > .coursework-item {
+  width: 100%;
+}
+
 
 @custom-variant dark (&:where(.dark, .dark *));
 

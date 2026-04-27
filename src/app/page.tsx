@@ -131,7 +131,7 @@ export default function Page() {
             <h2 className="text-xl font-bold">Relevant Coursework</h2>
           </BlurFade>
           <BlurFade delay={BLUR_FADE_DELAY * 8.3}>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {DATA.courses.map((course) => (
                 <span
                   key={`${course.code}-${course.name}`}

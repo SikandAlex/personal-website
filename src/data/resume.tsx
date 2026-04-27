@@ -16,6 +16,8 @@ import {
   GcpIcon,
   DrizzleIcon,
   LangchainIcon,
+  DynamoIcon,
+  BullmqIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -49,7 +51,7 @@ export const DATA = {
       items: [
         { name: "Node.js", icon: Nodejs },
         { name: "Twilio", icon: TwilioIcon },
-        { name: "BullMQ" },
+        { name: "BullMQ", icon: BullmqIcon },
       ],
     },
     {
@@ -65,7 +67,7 @@ export const DATA = {
       items: [
         { name: "PostgreSQL", icon: Postgresql },
         { name: "MongoDB", icon: MongoIcon },
-        { name: "DynamoDB" },
+        { name: "DynamoDB", icon: DynamoIcon },
         { name: "Vector Databases" },
         { name: "Redis", icon: RedisIcon },
         { name: "Prisma", icon: SiPrisma },

@@ -30,3 +30,16 @@ export const AwsIcon = colored(FaAws, "#FF9900");
 export const GcpIcon = colored(SiGooglecloud, "#4285F4");
 export const DrizzleIcon = colored(SiDrizzle, "#C5F74F");
 export const LangchainIcon = SiLangchain;
+
+// Static-asset-backed icons (no maintained icon set carries these)
+type ImgProps = { className?: string };
+
+export const DynamoIcon = ({ className }: ImgProps) => (
+  // eslint-disable-next-line @next/next/no-img-element
+  <img src="/dynamodb.svg" alt="DynamoDB" className={className} />
+);
+
+export const BullmqIcon = ({ className }: ImgProps) => (
+  // eslint-disable-next-line @next/next/no-img-element
+  <img src="/bullmq.png" alt="BullMQ" className={className} />
+);

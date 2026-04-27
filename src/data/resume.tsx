@@ -179,7 +179,7 @@ export const DATA = {
         "OpenAI",
         "Claude",
         "Langfuse",
-        "Drizzle",
+        "Prisma",
         "PostgreSQL",
       ],
       description:

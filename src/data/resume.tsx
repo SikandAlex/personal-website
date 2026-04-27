@@ -275,8 +275,7 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image:
-        "https://callsaver-demo-videos.s3.us-west-1.amazonaws.com/hero-videos/og/og-general.jpg",
+      image: "/callsaver.png",
       video: "",
     },
     {
@@ -301,7 +300,7 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         },
       ],
-      image: "https://getstackpass.com/img/og-image.png",
+      image: "/stackpass.svg",
       video: "",
     },
   ],

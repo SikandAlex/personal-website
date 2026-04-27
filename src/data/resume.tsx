@@ -86,6 +86,7 @@ export const DATA = {
         { name: "RAG" },
         { name: "Computer Vision" },
         { name: "Triton Inference Server", icon: NvidiaIcon },
+        { name: "TensorRT", icon: NvidiaIcon },
         { name: "Weights & Biases", icon: WandbIcon },
       ],
     },

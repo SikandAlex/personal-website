@@ -9,7 +9,7 @@ const labelLogoStyle = {
 } as const;
 
 const dateGapStyle = {
-  marginTop: "var(--label-date-gap, -20px)",
+  marginTop: "var(--label-date-gap, 16px)",
 } as const;
 
 export default function WorkSectionTimeline() {

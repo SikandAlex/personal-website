@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 const DEFAULT_SIZE = 120;
 const DEFAULT_RADIUS = 8;
-const DEFAULT_DATE_GAP = -20;
+const DEFAULT_DATE_GAP = 16;
 
 export default function LogoControls() {
   const [size, setSize] = useState(DEFAULT_SIZE);

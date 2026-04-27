@@ -34,6 +34,8 @@ import {
   OpenapiIcon,
   OpentelemetryIcon,
   LangfuseIcon,
+  SentryIcon,
+  IntercomIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -71,8 +73,10 @@ export const DATA = {
         { name: "Zod", icon: ZodIcon },
         { name: "OpenAPI", icon: OpenapiIcon },
         { name: "OpenTelemetry", icon: OpentelemetryIcon },
+        { name: "Sentry", icon: SentryIcon },
         { name: "BullMQ", icon: BullmqIcon },
         { name: "Twilio", icon: TwilioIcon },
+        { name: "Intercom", icon: IntercomIcon },
       ],
     },
     {
@@ -162,12 +166,15 @@ export const DATA = {
         "Express",
         "Zod",
         "OpenTelemetry",
+        "Sentry",
         "React.js",
         "Next.js",
         "AWS",
+        "GCP",
         "Redis",
         "BullMQ",
         "Twilio",
+        "Intercom",
         "LiveKit",
         "OpenAI",
         "Claude",

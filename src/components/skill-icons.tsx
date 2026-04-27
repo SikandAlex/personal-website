@@ -19,6 +19,8 @@ import {
   SiZod,
   SiOpenapiinitiative,
   SiOpentelemetry,
+  SiSentry,
+  SiIntercom,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 
@@ -56,6 +58,8 @@ export const TailwindIcon = colored(SiTailwindcss, "#06B6D4");
 export const ZodIcon = colored(SiZod, "#3E67B1");
 export const OpenapiIcon = colored(SiOpenapiinitiative, "#6BA539");
 export const OpentelemetryIcon = colored(SiOpentelemetry, "#F5A800");
+export const SentryIcon = colored(SiSentry, "#362D59");
+export const IntercomIcon = colored(SiIntercom, "#1F8DED");
 
 export const LangfuseIcon = ({ className }: ImgProps) => (
   // eslint-disable-next-line @next/next/no-img-element

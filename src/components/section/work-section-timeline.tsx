@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
+
 import { DATA } from "@/data/resume";
 import Markdown from "react-markdown";
+import { usePreview } from "@/components/dev/preview-context";
 
 const labelLogoStyle = {
   width: "var(--logo-size, 120px)",
@@ -12,7 +15,13 @@ const dateGapStyle = {
   marginTop: "var(--label-date-gap, 16px)",
 } as const;
 
+const ALL_SKILL_ITEMS = DATA.skillGroups.flatMap((g) => g.items);
+const findSkill = (name: string) =>
+  ALL_SKILL_ITEMS.find((s) => s.name === name);
+
 export default function WorkSectionTimeline() {
+  const { workSkills } = usePreview();
+
   return (
     <div className="flex flex-col">
       {DATA.work.map((work) => (
@@ -63,6 +72,24 @@ export default function WorkSectionTimeline() {
             <div className="prose prose-sm max-w-full text-muted-foreground dark:prose-invert prose-ul:my-1 prose-ul:pl-5 prose-li:my-1 prose-li:marker:text-muted-foreground">
               <Markdown>{work.description}</Markdown>
             </div>
+            {workSkills && work.skills && work.skills.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {work.skills.map((name) => {
+                  const skill = findSkill(name);
+                  return (
+                    <span
+                      key={name}
+                      className="inline-flex items-center gap-1 border border-border rounded-md px-2 py-0.5 text-[11px]"
+                    >
+                      {skill && "icon" in skill && skill.icon && (
+                        <skill.icon className="size-3 object-contain" />
+                      )}
+                      <span>{name}</span>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       ))}

@@ -14,7 +14,14 @@ export default function LogoControls() {
   const [dateGap, setDateGap] = useState(DEFAULT_DATE_GAP);
   const [collapsed, setCollapsed] = useState(false);
 
-  const { accent, setAccent } = usePreview();
+  const {
+    accent,
+    setAccent,
+    workSkills,
+    setWorkSkills,
+    projectTags,
+    setProjectTags,
+  } = usePreview();
 
   useEffect(() => {
     document.documentElement.style.setProperty("--logo-size", `${size}px`);
@@ -89,6 +96,31 @@ export default function LogoControls() {
               className="w-full accent-primary"
             />
           </label>
+          <div className="flex flex-col gap-1.5 text-xs">
+            <span>Variants</span>
+            <button
+              type="button"
+              onClick={() => setWorkSkills(!workSkills)}
+              className={`px-2 py-1 text-xs rounded border transition-colors text-left ${
+                workSkills
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background hover:bg-muted"
+              }`}
+            >
+              Work skill chips: {workSkills ? "on" : "off"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setProjectTags(!projectTags)}
+              className={`px-2 py-1 text-xs rounded border transition-colors text-left ${
+                projectTags
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background hover:bg-muted"
+              }`}
+            >
+              Project tags: {projectTags ? "on" : "off"}
+            </button>
+          </div>
           <label className="flex flex-col gap-1 text-xs">
             <div className="flex justify-between">
               <span>Particles color</span>
@@ -110,6 +142,8 @@ export default function LogoControls() {
               setRadius(DEFAULT_RADIUS);
               setDateGap(DEFAULT_DATE_GAP);
               setAccent(DEFAULT_ACCENT);
+              setWorkSkills(false);
+              setProjectTags(true);
             }}
             className="text-xs text-muted-foreground hover:text-foreground self-start underline underline-offset-2"
           >

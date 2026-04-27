@@ -13,6 +13,9 @@ import {
   SiClaude,
   SiModelcontextprotocol,
   SiExpress,
+  SiMui,
+  SiShadcnui,
+  SiTailwindcss,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 
@@ -44,6 +47,9 @@ export const OpenaiIcon = colored(SiOpenai, "#10A37F");
 export const ClaudeIcon = colored(SiClaude, "#D97757");
 export const McpIcon = SiModelcontextprotocol;
 export const ExpressIcon = SiExpress;
+export const MuiIcon = colored(SiMui, "#007FFF");
+export const ShadcnIcon = SiShadcnui;
+export const TailwindIcon = colored(SiTailwindcss, "#06B6D4");
 
 // Static-asset-backed icons (no maintained icon set carries these)
 type ImgProps = { className?: string };

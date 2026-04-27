@@ -7,16 +7,15 @@ import { TypingAnimation } from "@/components/ui/typing-animation";
 import { usePreview } from "@/components/dev/preview-context";
 
 interface Props {
-  /** Optional fixed text. When omitted, the component reads the dynamic greeting from PreviewContext (use this for the name line). */
-  text?: string;
+  text: string;
   className?: string;
   delay?: number;
   yOffset?: number;
 }
 
 export function HeroText({ text, className, delay, yOffset }: Props) {
-  const { heroStyle, accent, greeting } = usePreview();
-  const finalText = text ?? greeting;
+  const { heroStyle, accent } = usePreview();
+  const finalText = text;
 
   switch (heroStyle) {
     case "line-shadow":

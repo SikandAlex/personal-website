@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   usePreview,
-  HERO_GREETINGS,
   type HeroStyle,
-  type HeroGreeting,
 } from "@/components/dev/preview-context";
 
 const DEFAULT_SIZE = 120;
@@ -29,8 +27,6 @@ export default function LogoControls() {
   const {
     heroStyle,
     setHeroStyle,
-    greeting,
-    setGreeting,
     accent,
     setAccent,
   } = usePreview();
@@ -108,20 +104,6 @@ export default function LogoControls() {
               className="w-full accent-primary"
             />
           </label>
-          <label className="flex flex-col gap-1.5 text-xs">
-            <span>Hero greeting</span>
-            <select
-              value={greeting}
-              onChange={(e) => setGreeting(e.target.value as HeroGreeting)}
-              className="w-full px-2 py-1 text-xs rounded border bg-background"
-            >
-              {HERO_GREETINGS.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
-            </select>
-          </label>
           <div className="flex flex-col gap-1.5 text-xs">
             <span>Hero text style</span>
             <div className="grid grid-cols-2 gap-1">
@@ -162,7 +144,6 @@ export default function LogoControls() {
               setRadius(DEFAULT_RADIUS);
               setDateGap(DEFAULT_DATE_GAP);
               setHeroStyle("default");
-              setGreeting("Hi, I'm Alex");
               setAccent(DEFAULT_ACCENT);
             }}
             className="text-xs text-muted-foreground hover:text-foreground self-start underline underline-offset-2"

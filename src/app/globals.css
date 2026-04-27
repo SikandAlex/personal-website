@@ -2,6 +2,16 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
+/* Hide horizontal scrollbar visually while preserving the ability to scroll
+   (used on the GitHub contribution graph for the mobile overflow). */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
 /* Dev toggle: switch the coursework section between pills (default), single
    vertical list, and two-column grid. */
 :root[data-coursework-layout="list"] .coursework-list {

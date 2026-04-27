@@ -9,6 +9,9 @@ import {
   SiWeightsandbiases,
   SiNvidia,
   SiLivekit,
+  SiOpenai,
+  SiClaude,
+  SiModelcontextprotocol,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 
@@ -36,6 +39,9 @@ export const LangchainIcon = SiLangchain;
 export const WandbIcon = colored(SiWeightsandbiases, "#FFBE00");
 export const NvidiaIcon = colored(SiNvidia, "#76B900");
 export const LivekitIcon = colored(SiLivekit, "#06B6D4");
+export const OpenaiIcon = colored(SiOpenai, "#10A37F");
+export const ClaudeIcon = colored(SiClaude, "#D97757");
+export const McpIcon = SiModelcontextprotocol;
 
 // Static-asset-backed icons (no maintained icon set carries these)
 type ImgProps = { className?: string };

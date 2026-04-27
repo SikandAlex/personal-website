@@ -23,6 +23,9 @@ import {
   NvidiaIcon,
   PineconeIcon,
   LivekitIcon,
+  OpenaiIcon,
+  ClaudeIcon,
+  McpIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -84,6 +87,9 @@ export const DATA = {
     {
       name: "AI / ML",
       items: [
+        { name: "OpenAI", icon: OpenaiIcon },
+        { name: "Claude", icon: ClaudeIcon },
+        { name: "MCP", icon: McpIcon },
         { name: "PyTorch", icon: PytorchIcon },
         { name: "LangChain", icon: LangchainIcon },
         { name: "RAG" },

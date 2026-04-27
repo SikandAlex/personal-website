@@ -52,3 +52,8 @@ export const ZustandIcon = ({ className }: ImgProps) => (
   // eslint-disable-next-line @next/next/no-img-element
   <img src="/zustand.svg" alt="Zustand" className={className} />
 );
+
+export const PineconeIcon = ({ className }: ImgProps) => (
+  // eslint-disable-next-line @next/next/no-img-element
+  <img src="/pinecone.png" alt="Pinecone" className={className} />
+);

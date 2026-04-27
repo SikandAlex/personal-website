@@ -21,6 +21,7 @@ import {
   ZustandIcon,
   WandbIcon,
   NvidiaIcon,
+  PineconeIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -73,6 +74,7 @@ export const DATA = {
         { name: "MongoDB", icon: MongoIcon },
         { name: "DynamoDB", icon: DynamoIcon },
         { name: "Vector Databases" },
+        { name: "Pinecone", icon: PineconeIcon },
         { name: "Redis", icon: RedisIcon },
         { name: "Prisma", icon: SiPrisma },
         { name: "Drizzle", icon: DrizzleIcon },

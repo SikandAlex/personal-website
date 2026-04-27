@@ -10,6 +10,7 @@ import ProjectsSection from "@/components/section/projects-section";
 import WorkSectionTimeline from "@/components/section/work-section-timeline";
 // import GitHubActivity from "@/components/section/github-activity"; // hidden until contribution count is fuller
 import { ArrowUpRight, MapPin } from "lucide-react";
+import { Icons } from "@/components/icons";
 
 const BLUR_FADE_DELAY = 0.04;
 
@@ -36,6 +37,18 @@ export default function Page() {
                   <MapPin className="size-4" aria-hidden />
                   <span>{DATA.location}</span>
                 </div>
+              </BlurFade>
+              <BlurFade delay={BLUR_FADE_DELAY * 2}>
+                <Link
+                  href={DATA.contact.social.LinkedIn.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Connect on LinkedIn"
+                  className="inline-flex items-center gap-1.5 rounded-md bg-[#0A66C2] px-3 py-1.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#0953a1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-fit"
+                >
+                  <Icons.linkedin className="size-3.5 sm:size-4" />
+                  Connect on LinkedIn
+                </Link>
               </BlurFade>
             </div>
             <BlurFade delay={BLUR_FADE_DELAY} className="order-1 md:order-2">

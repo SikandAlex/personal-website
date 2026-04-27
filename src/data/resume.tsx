@@ -32,6 +32,8 @@ import {
   TailwindIcon,
   ZodIcon,
   OpenapiIcon,
+  OpentelemetryIcon,
+  LangfuseIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -68,6 +70,7 @@ export const DATA = {
         { name: "Express", icon: ExpressIcon },
         { name: "Zod", icon: ZodIcon },
         { name: "OpenAPI", icon: OpenapiIcon },
+        { name: "OpenTelemetry", icon: OpentelemetryIcon },
         { name: "BullMQ", icon: BullmqIcon },
         { name: "Twilio", icon: TwilioIcon },
       ],
@@ -108,6 +111,7 @@ export const DATA = {
         { name: "TensorRT", icon: NvidiaIcon },
         { name: "Weights & Biases", icon: WandbIcon },
         { name: "LiveKit", icon: LivekitIcon },
+        { name: "Langfuse", icon: LangfuseIcon },
         { name: "RAG" },
         { name: "Computer Vision" },
       ],
@@ -157,6 +161,7 @@ export const DATA = {
         "Node.js",
         "Express",
         "Zod",
+        "OpenTelemetry",
         "React.js",
         "Next.js",
         "AWS",
@@ -166,11 +171,12 @@ export const DATA = {
         "LiveKit",
         "OpenAI",
         "Claude",
+        "Langfuse",
         "Drizzle",
         "PostgreSQL",
       ],
       description:
-        "- Shipped voice AI platform from zero to **100+ paying customers** as sole engineer — STT-LLM-TTS pipeline handling inbound calls, appointment booking, and after-hours routing for field service businesses.\n- Built and deployed the full product surface: API, customer dashboard, marketing site, billing, job queues, and CRM integrations across separate staging and production environments.\n- Owned architecture, deployment, and on-call from day one — debugging latency, tuning inference cost, and integrating webhooks with downstream CRMs.",
+        "- Shipped voice AI platform **from zero to 100+ paying customers** as sole engineer — STT-LLM-TTS pipeline handling inbound calls, appointment booking, and after-hours routing for field service businesses.\n- Built and deployed the full product surface: API, customer dashboard, marketing site, billing, job queues, and CRM integrations across separate staging and production environments.\n- Owned architecture, deployment, and on-call from day one — debugging latency, tuning inference cost, and integrating webhooks with downstream CRMs.",
     },
     {
       company: "Impel",
@@ -225,7 +231,7 @@ export const DATA = {
         "Docker",
       ],
       description:
-        "- Led ML Ops at Silk Labs — built labeling pipelines for synthetic image data and training infrastructure on multi-GPU clusters.\n- Productionized computer vision models for **stadium-scale facial detection, firearm detection, and super-resolution** — served **150+ concurrent RTSP camera feeds** via Triton Inference Server with INT8 quantization.",
+        "- Led ML Ops at Silk Labs — built labeling pipelines for synthetic image data and training infrastructure on multi-GPU clusters.\n- Productionized computer vision models for stadium-scale facial detection, firearm detection, and super-resolution — served **150+ concurrent RTSP camera feeds** via Triton Inference Server with INT8 quantization.",
     },
   ],
   education: [

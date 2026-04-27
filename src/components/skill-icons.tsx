@@ -18,6 +18,7 @@ import {
   SiTailwindcss,
   SiZod,
   SiOpenapiinitiative,
+  SiOpentelemetry,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 
@@ -54,6 +55,12 @@ export const ShadcnIcon = SiShadcnui;
 export const TailwindIcon = colored(SiTailwindcss, "#06B6D4");
 export const ZodIcon = colored(SiZod, "#3E67B1");
 export const OpenapiIcon = colored(SiOpenapiinitiative, "#6BA539");
+export const OpentelemetryIcon = colored(SiOpentelemetry, "#F5A800");
+
+export const LangfuseIcon = ({ className }: ImgProps) => (
+  // eslint-disable-next-line @next/next/no-img-element
+  <img src="/langfuse.png" alt="Langfuse" className={className} />
+);
 
 // Static-asset-backed icons (no maintained icon set carries these)
 type ImgProps = { className?: string };

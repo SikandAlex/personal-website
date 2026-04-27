@@ -23,16 +23,18 @@ export default function ContactSection() {
         <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
           Get in Touch
         </h2>
-        <p className="mx-auto max-w-lg text-muted-foreground text-balance">
-          Want to chat? Reach out to {DATA.name.split(" ")[0]} at{" "}
-          <Link
-            href={`mailto:${DATA.contact.email}`}
-            className="text-blue-500 hover:underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
-          >
-            {DATA.contact.email}
-          </Link>
-          . I&apos;ll respond whenever I can.
-        </p>
+        <div className="mx-auto max-w-lg text-muted-foreground text-balance space-y-1">
+          <p>Want to chat?</p>
+          <p>
+            Reach out at{" "}
+            <Link
+              href={`mailto:${DATA.contact.email}`}
+              className="text-blue-500 hover:underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+            >
+              {DATA.contact.email}
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

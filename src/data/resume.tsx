@@ -61,8 +61,8 @@ export const DATA = {
       items: [
         { name: "Node.js", icon: Nodejs },
         { name: "Express", icon: ExpressIcon },
-        { name: "Twilio", icon: TwilioIcon },
         { name: "BullMQ", icon: BullmqIcon },
+        { name: "Twilio", icon: TwilioIcon },
       ],
     },
     {

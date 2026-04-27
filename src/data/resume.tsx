@@ -247,7 +247,9 @@ export const DATA = {
     {
       school: "Boston University",
       href: "https://www.bu.edu",
-      degree: "M.S. Artificial Intelligence",
+      degreeShort: "M.S.",
+      degreeLong: "Master of Science",
+      degreeField: "Artificial Intelligence",
       logoUrl: "/boston-university.png",
       start: "2020",
       end: "2021",
@@ -255,7 +257,9 @@ export const DATA = {
     {
       school: "Boston University",
       href: "https://www.bu.edu",
-      degree: "B.A. Computer Science",
+      degreeShort: "B.A.",
+      degreeLong: "Bachelor of Arts",
+      degreeField: "Computer Science",
       logoUrl: "/boston-university.png",
       start: "2016",
       end: "2020",

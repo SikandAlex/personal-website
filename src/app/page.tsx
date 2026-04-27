@@ -79,7 +79,7 @@ export default function Page() {
           <div className="flex flex-col gap-8">
             {DATA.education.map((education, index) => (
               <BlurFade
-                key={`${education.school}-${education.degree}`}
+                key={`${education.school}-${education.degreeShort}-${education.degreeField}`}
                 delay={BLUR_FADE_DELAY * 8 + index * 0.05}
               >
                 <div className="flex items-center gap-x-3 justify-between">
@@ -110,7 +110,13 @@ export default function Page() {
                         {education.school}
                       </div>
                       <div className="font-sans text-sm text-muted-foreground">
-                        {education.degree}
+                        <span className="hidden sm:inline">
+                          {education.degreeShort} {education.degreeField}
+                        </span>
+                        <span className="sm:hidden flex flex-col">
+                          <span>{education.degreeLong}</span>
+                          <span>{education.degreeField}</span>
+                        </span>
                       </div>
                     </div>
                   </div>

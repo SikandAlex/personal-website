@@ -16,7 +16,7 @@ function ProjectImage({ src, alt }: { src: string; alt: string }) {
   }
 
   return (
-    <div className="w-full h-48 bg-muted flex items-center justify-center p-6">
+    <div className="w-full h-48 bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center p-8 border-b border-border">
       <img
         src={src}
         alt={alt}

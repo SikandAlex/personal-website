@@ -8,6 +8,7 @@ import Markdown from "react-markdown";
 import ContactSection from "@/components/section/contact-section";
 import ProjectsSection from "@/components/section/projects-section";
 import WorkSectionTimeline from "@/components/section/work-section-timeline";
+import GitHubActivity from "@/components/section/github-activity";
 import { ArrowUpRight, MapPin } from "lucide-react";
 
 const BLUR_FADE_DELAY = 0.04;
@@ -228,6 +229,16 @@ export default function Page() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+      <section id="github-activity">
+        <div className="flex min-h-0 flex-col gap-y-4">
+          <BlurFade delay={BLUR_FADE_DELAY * 10.5}>
+            <h2 className="text-xl font-bold">GitHub Activity</h2>
+          </BlurFade>
+          <BlurFade delay={BLUR_FADE_DELAY * 10.6}>
+            <GitHubActivity username="SikandAlex" />
+          </BlurFade>
         </div>
       </section>
       <section id="projects">

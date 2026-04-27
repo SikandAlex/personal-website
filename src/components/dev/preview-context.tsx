@@ -14,9 +14,9 @@ type PreviewContextValue = {
 const DEFAULTS: PreviewContextValue = {
   accent: "#7C3AED",
   setAccent: () => {},
-  workSkills: false,
+  workSkills: true,
   setWorkSkills: () => {},
-  projectTags: true,
+  projectTags: false,
   setProjectTags: () => {},
 };
 
@@ -24,8 +24,8 @@ const PreviewContext = createContext<PreviewContextValue>(DEFAULTS);
 
 export function PreviewProvider({ children }: { children: ReactNode }) {
   const [accent, setAccent] = useState<string>("#7C3AED");
-  const [workSkills, setWorkSkills] = useState<boolean>(false);
-  const [projectTags, setProjectTags] = useState<boolean>(true);
+  const [workSkills, setWorkSkills] = useState<boolean>(true);
+  const [projectTags, setProjectTags] = useState<boolean>(false);
 
   return (
     <PreviewContext.Provider

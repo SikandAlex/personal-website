@@ -142,8 +142,8 @@ export default function LogoControls() {
               setRadius(DEFAULT_RADIUS);
               setDateGap(DEFAULT_DATE_GAP);
               setAccent(DEFAULT_ACCENT);
-              setWorkSkills(false);
-              setProjectTags(true);
+              setWorkSkills(true);
+              setProjectTags(false);
             }}
             className="text-xs text-muted-foreground hover:text-foreground self-start underline underline-offset-2"
           >

@@ -146,22 +146,10 @@ export default function Page() {
                       <img
                         src={cert.logoUrl}
                         alt={cert.issuer}
-                        className="object-contain flex-none"
-                        style={{
-                          width: "var(--logo-size, 120px)",
-                          height: "var(--logo-size, 120px)",
-                          borderRadius: "var(--logo-radius, 8px)",
-                        }}
+                        className="size-16 object-contain flex-none rounded-md"
                       />
                     ) : (
-                      <div
-                        className="bg-muted flex-none"
-                        style={{
-                          width: "var(--logo-size, 120px)",
-                          height: "var(--logo-size, 120px)",
-                          borderRadius: "var(--logo-radius, 8px)",
-                        }}
-                      />
+                      <div className="size-16 flex-none rounded-md bg-muted" />
                     )}
                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                       <div className="font-semibold leading-snug flex items-center gap-2">

@@ -22,6 +22,7 @@ import {
   WandbIcon,
   NvidiaIcon,
   PineconeIcon,
+  LivekitIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -89,6 +90,7 @@ export const DATA = {
         { name: "Computer Vision" },
         { name: "Triton Inference Server", icon: NvidiaIcon },
         { name: "TensorRT", icon: NvidiaIcon },
+        { name: "LiveKit", icon: LivekitIcon },
         { name: "Weights & Biases", icon: WandbIcon },
       ],
     },

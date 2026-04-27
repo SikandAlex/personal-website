@@ -8,6 +8,7 @@ import {
   SiDrizzle,
   SiWeightsandbiases,
   SiNvidia,
+  SiLivekit,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 
@@ -34,6 +35,7 @@ export const DrizzleIcon = colored(SiDrizzle, "#C5F74F");
 export const LangchainIcon = SiLangchain;
 export const WandbIcon = colored(SiWeightsandbiases, "#FFBE00");
 export const NvidiaIcon = colored(SiNvidia, "#76B900");
+export const LivekitIcon = colored(SiLivekit, "#06B6D4");
 
 // Static-asset-backed icons (no maintained icon set carries these)
 type ImgProps = { className?: string };

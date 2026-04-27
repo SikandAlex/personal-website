@@ -7,20 +7,22 @@ import { TypingAnimation } from "@/components/ui/typing-animation";
 import { usePreview } from "@/components/dev/preview-context";
 
 interface Props {
-  text: string;
+  /** Optional fixed text. When omitted, the component reads the dynamic greeting from PreviewContext (use this for the name line). */
+  text?: string;
   className?: string;
   delay?: number;
   yOffset?: number;
 }
 
 export function HeroText({ text, className, delay, yOffset }: Props) {
-  const { heroStyle, accent } = usePreview();
+  const { heroStyle, accent, greeting } = usePreview();
+  const finalText = text ?? greeting;
 
   switch (heroStyle) {
     case "line-shadow":
       return (
         <h2 className={className}>
-          <LineShadowText shadowColor={accent}>{text}</LineShadowText>
+          <LineShadowText shadowColor={accent}>{finalText}</LineShadowText>
         </h2>
       );
     case "aurora":
@@ -29,7 +31,7 @@ export function HeroText({ text, className, delay, yOffset }: Props) {
           <AuroraText
             colors={[accent, "#0070F3", "#38bdf8", accent]}
           >
-            {text}
+            {finalText}
           </AuroraText>
         </h2>
       );
@@ -40,13 +42,14 @@ export function HeroText({ text, className, delay, yOffset }: Props) {
           duration={60}
           startOnView
         >
-          {text}
+          {finalText}
         </TypingAnimation>
       );
     default:
       return (
         <BlurFadeText
-          text={text}
+          text={finalText}
+
           className={className}
           delay={delay}
           yOffset={yOffset}

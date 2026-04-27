@@ -170,7 +170,7 @@ export const DATA = {
         "PostgreSQL",
       ],
       description:
-        "- Built a production voice AI platform from zero to revenue — engineered a low-latency STT-LLM-TTS pipeline with LiveKit and Twilio handling inbound calls, appointment booking, lead qualification, and after-hours routing for field service businesses.\n- Built Node.js/Express API, React + Vite frontend, Next.js SEO-optimized landing page, Redis job queues, and Stripe billing — deployed across AWS in separate staging/production environments.\n- Sole engineer from architecture through deployment — shipped end-to-end product, integrated webhooks and CRM automation, and acquired 100+ paying customers.",
+        "- Shipped voice AI platform from zero to **100+ paying customers** as sole engineer — STT-LLM-TTS pipeline handling inbound calls, appointment booking, and after-hours routing for field service businesses.\n- Built and deployed the full product surface: API, customer dashboard, marketing site, billing, job queues, and CRM integrations across separate staging and production environments.\n- Owned architecture, deployment, and on-call from day one — debugging latency, tuning inference cost, and integrating webhooks with downstream CRMs.",
     },
     {
       company: "Impel",
@@ -191,7 +191,7 @@ export const DATA = {
         "Twilio",
       ],
       description:
-        "- Contributed to comprehensive AWS cloud infrastructure (Fargate, S3, RDS PostgreSQL, DynamoDB, MongoDB Atlas, Lambda, API Gateway, ECS, SQS, SES) using CDK CloudFormation infrastructure-as-code, serving 1,000+ car dealerships, processing 250,000+ outbound messages daily.\n- Helped to maintain ServiceAI omni-channel platform for re-activating dealership customers and extracting maximum customer lifetime value through seamless email (AWS SES) and SMS (Twilio) agent integration.",
+        "- Built and operated AWS infrastructure powering **ServiceAI across 1,000+ car dealerships**, processing **250K+ outbound customer messages daily** via email and SMS.\n- Maintained the omni-channel re-engagement platform driving dealership-customer reactivation and lifetime-value lift.",
     },
     {
       company: "Pivotal",
@@ -204,7 +204,7 @@ export const DATA = {
       end: "Jun 2023",
       skills: ["Python", "React.js", "TypeScript", "Material UI", "OpenAPI"],
       description:
-        "- Developed Python Django backend infrastructure for processing big data files from eVTOL aircraft telemetry, handling long-running processing jobs for flight data analysis.\n- Refactored 30+ MaterialUI components from v0 to v3 and converted React class components to functional hooks by hand, programmatically generated a proof-of-concept OpenAPI OAS3 schema for over 400+ API methods.",
+        "- Built Python Django backend processing big-data telemetry from eVTOL aircraft for flight-data analysis.\n- Modernized **30+ legacy UI components** to current major versions and generated an **OpenAPI spec covering 400+ API methods** to unblock client integration.",
     },
     {
       company: "Silk Labs",
@@ -225,7 +225,7 @@ export const DATA = {
         "Docker",
       ],
       description:
-        "- Led ML Ops team at Silk Labs, created labeling pipelines for synthetically generated images using Python notebooks, Weights & Biases for training runs, and training on RTX 2080 Ti and V100 GPUs.\n- Productionized computer vision models for stadium crowd-scale facial detection, firearm detection with low latency reporting, and super-resolution using Nvidia Triton Inference Server and INT8 quantization, supporting 150+ concurrent camera feeds via RTSP streams enabled by Pion WebRTC to reduce latency.",
+        "- Led ML Ops at Silk Labs — built labeling pipelines for synthetic image data and training infrastructure on multi-GPU clusters.\n- Productionized computer vision models for **stadium-scale facial detection, firearm detection, and super-resolution** — served **150+ concurrent RTSP camera feeds** via Triton Inference Server with INT8 quantization.",
     },
   ],
   education: [

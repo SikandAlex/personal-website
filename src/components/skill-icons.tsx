@@ -6,6 +6,8 @@ import {
   SiGooglecloud,
   SiLangchain,
   SiDrizzle,
+  SiWeightsandbiases,
+  SiNvidia,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 
@@ -30,6 +32,8 @@ export const AwsIcon = colored(FaAws, "#FF9900");
 export const GcpIcon = colored(SiGooglecloud, "#4285F4");
 export const DrizzleIcon = colored(SiDrizzle, "#C5F74F");
 export const LangchainIcon = SiLangchain;
+export const WandbIcon = colored(SiWeightsandbiases, "#FFBE00");
+export const NvidiaIcon = colored(SiNvidia, "#76B900");
 
 // Static-asset-backed icons (no maintained icon set carries these)
 type ImgProps = { className?: string };

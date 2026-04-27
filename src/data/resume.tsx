@@ -19,6 +19,8 @@ import {
   DynamoIcon,
   BullmqIcon,
   ZustandIcon,
+  WandbIcon,
+  NvidiaIcon,
 } from "@/components/skill-icons";
 import { SiPrisma } from "react-icons/si";
 
@@ -83,6 +85,8 @@ export const DATA = {
         { name: "LangChain", icon: LangchainIcon },
         { name: "RAG" },
         { name: "Computer Vision" },
+        { name: "Triton Inference Server", icon: NvidiaIcon },
+        { name: "Weights & Biases", icon: WandbIcon },
       ],
     },
   ],

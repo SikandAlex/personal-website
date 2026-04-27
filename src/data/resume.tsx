@@ -43,7 +43,7 @@ export const DATA = {
   locationLink: "https://www.google.com/maps/place/sanfrancisco",
   description: "Full-Stack AI Engineer",
   summary:
-    "Full-stack engineer who ships production AI from architecture to revenue. Built CallSaver's voice AI platform end-to-end (100+ paying customers, sole engineer), shipped AWS infrastructure for 1,000+ enterprise dealerships at Impel, and productionized computer vision models at Silk Labs. Open to full-stack roles at AI-focused startups.",
+    "Full-stack engineer who ships production AI from architecture to revenue. Built CallSaver's voice AI platform end-to-end (100+ paying customers, sole engineer), shipped AWS infrastructure for 1,000+ enterprise dealerships at Impel, and productionized computer vision models at Silk Labs.",
   avatarUrl: "/alex-sikand.png",
   skillGroups: [
     {

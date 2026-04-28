@@ -322,7 +322,7 @@ export const DATA = {
   ],
   certifications: [
     {
-      name: "Fine-tuning and Reinforcement Learning for LLMs (In Progress)",
+      name: "Fine-tuning and Reinforcement Learning for LLMs",
       issuer: "DeepLearning.AI",
       issued: "In Progress",
       credentialId: "dlai-fine-tuning-rl-llms",

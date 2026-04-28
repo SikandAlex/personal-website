@@ -162,7 +162,7 @@ export const DATA = {
       location: "Remote",
       title: "Founding Engineer",
       logoUrl: "/callsaver.png",
-      start: "Jan 2025",
+      start: "Feb 2025",
       end: "Present",
       skills: [
         "TypeScript",
@@ -196,8 +196,8 @@ export const DATA = {
       location: "Remote",
       title: "Software Engineer",
       logoUrl: "/impel.png",
-      start: "Feb 2024",
-      end: "Jan 2025",
+      start: "Mar 2024",
+      end: "Feb 2025",
       skills: [
         "TypeScript",
         "Node.js",
@@ -217,8 +217,8 @@ export const DATA = {
       location: "Palo Alto, CA",
       title: "Software Engineer",
       logoUrl: "/pivotal.png",
-      start: "Jul 2022",
-      end: "Jun 2023",
+      start: "Aug 2022",
+      end: "Jul 2023",
       skills: ["Python", "React.js", "TypeScript", "Material UI", "OpenAPI"],
       description:
         "- Built Python Django backend processing big-data telemetry from eVTOL aircraft for flight-data analysis.\n- Modernized **30+ legacy UI components** to current major versions and generated an **OpenAPI spec covering 400+ API methods** to unblock client integration.",
@@ -230,8 +230,8 @@ export const DATA = {
       location: "Las Vegas, NV",
       title: "Machine Learning Engineer",
       logoUrl: "/silk-labs.png",
-      start: "Sep 2020",
-      end: "Jul 2022",
+      start: "Oct 2020",
+      end: "Aug 2022",
       skills: [
         "Python",
         "PyTorch",

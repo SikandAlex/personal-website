@@ -170,7 +170,7 @@ export default async function Image() {
                                 <span>{DATA.description}</span>
                             </div>
                             <div style={styles.name}>{DATA.name}</div>
-                            <div style={styles.description}>{DATA.summary.split(".")[0]}.</div>
+                            <div style={styles.description}>{`${DATA.summary.split(".")[0]}.`}</div>
                             <div style={styles.locationRow}>
                                 <MapPinIcon />
                                 <span>{DATA.location}</span>

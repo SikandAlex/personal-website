@@ -322,6 +322,14 @@ export const DATA = {
   ],
   certifications: [
     {
+      name: "Fine-tuning and Reinforcement Learning for LLMs (In Progress)",
+      issuer: "DeepLearning.AI",
+      issued: "In Progress",
+      credentialId: "dlai-fine-tuning-rl-llms",
+      href: "https://www.deeplearning.ai/courses/fine-tuning-and-reinforcement-learning-for-llms-intro-to-post-training/",
+      logoUrl: "/deeplearning-ai.webp",
+    },
+    {
       name: "Python and Statistics for Financial Analysis",
       issuer: "The Hong Kong University of Science and Technology",
       issued: "May 2020",

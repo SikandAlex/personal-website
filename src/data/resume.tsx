@@ -49,7 +49,7 @@ export const DATA = {
   locationLink: "https://www.google.com/maps/place/sanfrancisco",
   description: "Full-Stack AI Engineer",
   summary:
-    "Full-stack engineer who ships production AI from architecture to revenue. Built CallSaver's voice AI platform end-to-end (100+ paying customers, sole engineer), shipped AWS infrastructure for 1,000+ enterprise dealerships at Impel, and productionized computer vision models at Silk Labs.",
+    "Full-stack engineer who ships production AI from architecture to revenue. Built CallSaver's voice AI platform end-to-end (paying customers, sole engineer), shipped AWS infrastructure for 1,000+ enterprise dealerships at Impel, and productionized computer vision models at Silk Labs.",
   avatarUrl: "/alex-sikand.png",
   skillGroups: [
     {
@@ -187,7 +187,7 @@ export const DATA = {
         "PostgreSQL",
       ],
       description:
-        "- Shipped voice AI platform **from zero to 100+ paying customers** as sole engineer — STT-LLM-TTS pipeline handling inbound calls, appointment booking, and after-hours routing for field service businesses.\n- Built and deployed the full product surface: API, customer dashboard, marketing site, billing, job queues, and CRM integrations across separate staging and production environments.\n- Owned architecture, deployment, and on-call from day one — debugging latency, tuning inference cost, and integrating webhooks with downstream CRMs.",
+        "- Shipped voice AI platform **from zero to paying customers** as sole engineer — STT-LLM-TTS pipeline handling inbound calls, appointment booking, and after-hours routing for field service businesses.\n- Built and deployed the full product surface: API, customer dashboard, marketing site, billing, job queues, and CRM integrations across separate staging and production environments.\n- Owned architecture, deployment, and on-call from day one — debugging latency, tuning inference cost, and integrating webhooks with downstream CRMs.",
     },
     {
       company: "Impel",

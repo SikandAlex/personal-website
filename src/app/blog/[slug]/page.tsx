@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXContent } from "@content-collections/mdx/react";
 import { mdxComponents } from "@/mdx-components";
+import { Comments } from "@/components/comments";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -150,6 +151,11 @@ export default async function Blog({
       <article className="prose max-w-full text-pretty font-sans leading-relaxed text-muted-foreground dark:prose-invert">
         <MDXContent code={post.mdx} components={mdxComponents} />
       </article>
+
+      <section className="mt-12 pt-8 border-t border-border">
+        <h2 className="text-lg font-semibold mb-4">Comments</h2>
+        <Comments />
+      </section>
 
       <nav className="mt-12 pt-8 max-w-2xl">
         <div className="flex flex-col sm:flex-row justify-between gap-4">

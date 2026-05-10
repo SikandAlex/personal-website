@@ -1,0 +1,90 @@
+---
+title: "$7.30 Gas Made Me Optimize My AWS Bill"
+publishedAt: "2026-05-09"
+author: "Alex Sikand"
+summary: "My local gas station is now charging $7.30 a gallon, so I spent the day chasing AWS savings instead of filling up. Here's how I cut about $115 a month across four wins."
+---
+
+My local gas station is now charging **$7.30 a gallon**. So instead of filling up, I decided it was time to save some money the only way I know how — aggressively chasing AWS cost optimization.
+
+Four wins from today, in order.
+
+## Win 1: Secrets Manager → SSM Parameter Store
+
+Migrated **190 secrets** from AWS Secrets Manager to AWS SSM Parameter Store. I wasn't using auto-rotation or any of the other Secrets-Manager-only features, so this was pure waste.
+
+**Savings: ~$75/month.**
+
+## Win 2: EC2 right-sizing
+
+[DocuSeal](https://www.docuseal.com/) ([github.com/docusealco/docuseal](https://github.com/docusealco/docuseal)) is the open-source Ruby on Rails document signing server I run at `forms.callsaver.ai`. Upgraded it from v2.3.1 → v2.5.2.
+
+The interesting bit is in v2.4.3, which shipped memory optimizations. With those landed, I could shrink the EC2 instance:
+
+1. **t3.small → t3a.micro** — AMD instead of Intel, and crucially the smaller size now fits. About **$10/month** saved here.
+2. **t3a.micro → t4g.micro** — then ARM (Graviton) on top of that, an additional **$0.88/month**.
+
+DocuSeal subtotal: **~$10.88/month**.
+
+## Win 3: Staging NAT Gateway → fck-nat
+
+Swapped the managed AWS NAT Gateway in our staging environment for a **t4g.nano running [fck-nat](https://fck-nat.dev/stable)**. fck-nat is a drop-in NAT-instance replacement that runs on a tiny EC2 — same NAT semantics, ~10% of the price, and **no per-GB data processing charge**.
+
+| | **Managed NAT Gateway** | **fck-nat (t4g.nano)** |
+| --- | ---: | ---: |
+| Hourly | $0.045 | $0.0042 |
+| Per GB processed | $0.045 | $0.00 |
+
+On AWS CDK, the [`cdk-fck-nat`](https://github.com/AndrewGuenther/cdk-fck-nat) construct wires it in cleanly. I also looked at Chime's [alterNAT](https://github.com/chime/terraform-aws-alternat) as the main alternative — the architectural comparison and why I went with fck-nat is its own write-up: [**Choosing a NAT Instance: fck-nat vs alterNAT**](/blog/fck-nat-vs-alternat).
+
+**Savings: $29.14/month** on staging alone.
+
+## Win 4: S3 Gateway VPC Endpoint (free)
+
+Even after moving staging to fck-nat, production was still paying $0.045/GB to the managed NAT Gateway for traffic that didn't need to go through it at all — most notably **S3 reads/writes, including ECR image layer pulls** (ECR stores layer blobs in S3 under the hood).
+
+The fix is one line of CDK:
+
+```ts
+this.vpc.addGatewayEndpoint('S3Endpoint', {
+  service: ec2.GatewayVpcEndpointAwsService.S3,
+});
+```
+
+VPC Gateway Endpoints for S3 are completely free — no hourly, no per-GB. They install a route-table entry that sends S3 traffic directly to S3, bypassing NAT entirely. Bonus: S3 reads/writes stop depending on NAT health. Deployed to both staging and production.
+
+**Savings: variable but free — eliminates NAT data-processing fees on all S3 traffic.**
+
+## Summary
+
+| Change | Monthly savings |
+| --- | ---: |
+| Secrets Manager → SSM Parameter Store (190 secrets) | $75.00 |
+| DocuSeal EC2: t3.small → t3a.micro → t4g.micro | $10.88 |
+| Staging NAT Gateway → t4g.nano + fck-nat | $29.14 |
+| S3 gateway endpoint (staging + production) | free, eliminates NAT data fees on S3 |
+| **Total** | **~$115/month + variable S3 savings** |
+
+That's roughly **15.8 gallons of gas a month** at current rates, before counting whatever the S3 endpoint claws back. Not bad for a Friday night.
+
+## Links
+
+The tools and projects referenced above:
+
+### DocuSeal
+
+<LinkPreview href="https://www.docuseal.com/" />
+
+<LinkPreview href="https://github.com/docusealco/docuseal" />
+
+### fck-nat
+
+<LinkPreview href="https://fck-nat.dev/stable" />
+
+<LinkPreview href="https://github.com/AndrewGuenther/fck-nat" />
+
+<LinkPreview href="https://github.com/AndrewGuenther/cdk-fck-nat" />
+
+### alterNAT
+
+<LinkPreview href="https://github.com/chime/terraform-aws-alternat" />

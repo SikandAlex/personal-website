@@ -1,0 +1,87 @@
+---
+title: "Choosing a NAT Instance: fck-nat vs alterNAT"
+publishedAt: "2026-05-09"
+author: "Alex Sikand"
+summary: "The two serious open-source replacements for AWS managed NAT Gateways take different architectural bets. Here's how they compare and why I picked fck-nat for a CDK-based stack."
+---
+
+While [chasing AWS cost optimizations the other day](/blog/gas-prices-and-aws-cost-optimization), I needed to pick between the two well-known open-source replacements for AWS's managed NAT Gateway:
+
+- [`AndrewGuenther/fck-nat`](https://github.com/AndrewGuenther/fck-nat) — the (f)easible (c)ost (k)onfigurable NAT.
+- [`chime/terraform-aws-alternat`](https://github.com/chime/terraform-aws-alternat) — Chime's high-availability NAT-instance solution, called **alterNAT**.
+
+Both projects start from the same observation (managed NAT Gateway data-processing fees are the line item to kill), but they take meaningfully different architectural bets.
+
+## fck-nat: simple, single-instance
+
+fck-nat is, by design, the small-and-sharp option:
+
+- A pre-baked AMI on Amazon Linux 2023 (ARM and x86), pinned at up to **5 Gbps burst** on a `t4g.nano`.
+- One instance per AZ, **no Lambda, no ASG, no fallback NAT Gateway**.
+- HA is supported via a secondary instance, but the current failover swaps the route table — which drops in-flight TCP connections. The author's stated next step is `conntrackd` + `keepalived` for connection-preserving failover.
+- 5 Gbps is also the EC2 egress ceiling, so fck-nat tops out there. Past that you genuinely need managed NAT Gateway.
+
+The pricing gap vs. the managed service:
+
+| | **Managed NAT Gateway** | **fck-nat (t4g.nano)** |
+| --- | ---: | ---: |
+| Hourly | $0.045 | $0.0042 |
+| Per GB processed | $0.045 | $0.00 |
+| EBS (gp3, monthly) | — | $0.64 |
+
+## alterNAT: higher floor, more moving parts
+
+alterNAT trades simplicity for stronger uptime guarantees:
+
+- An **Auto Scaling Group per AZ** containing one NAT instance, **plus a standby NAT Gateway per AZ as a fallback** (yes — it keeps the thing it's trying to replace, on standby).
+- A `replace-route` **Lambda** that runs on two triggers:
+  1. ASG lifecycle hooks (when the instance is being replaced for routine patching), and
+  2. a once-per-minute health check that `curl`s `https://www.example.com` and `https://www.google.com` from the private subnet. If the check fails, the Lambda flips the route to the standby NAT Gateway.
+- Optional auto-recovery back to the NAT instance via SSM-driven validation, with a documented edge case of flapping if the instance looks healthy on `curl` but is misconfigured at the SG layer.
+- **Max instance lifetime** (default 14 days) automates patching by deliberately churning instances; the route briefly points at the standby NAT Gateway during each replacement.
+- Recommended threshold from Chime themselves in the README: only worth the operational complexity if you're processing **more than ~10 TB/month** through NAT Gateway today.
+
+## The fundamental tradeoff
+
+alterNAT trades complexity for *guaranteed connectivity to the internet at all times* — the standby NAT GW is always there as a fallback. The cost is that route swaps drop in-flight TCP connections (the NAT translation table is lost when the public IP changes). Connectivity is never lost; individual connections are.
+
+fck-nat keeps things simple and cheaper, but its current HA story is weaker — until the conntrackd work lands, a failed instance means a route swap (also dropping connections), but without a standby NAT Gateway as a safety net.
+
+The fck-nat author summed up his own view of the comparison [on Hacker News](https://news.ycombinator.com/item?id=39234968):
+
+> My big issue with Alternat is that it actively updates the route table which can still cause availability problems. It's a shorter outage than the current fck-nat replacement methodology, but it is still dropping connections.
+
+Both projects have happy production users — see [this r/aws thread](https://www.reddit.com/r/aws/comments/1j01egs/has_anyone_used_alternat_to_replace_nat_gateway/) for a representative sampling, including one team running alterNAT against ~$1M/year of NAT Gateway spend.
+
+## Why I picked fck-nat
+
+Two reasons:
+
+1. **Stars as a popularity proxy.** fck-nat sits at ~2.1k stars vs alterNAT's ~1.2k. Not a perfect signal, but it correlates with how many other people have hit edge cases and reported them.
+2. **CDK fit.** I'm on AWS CDK, not Terraform/OpenTofu. fck-nat ships a first-party CDK construct ([`cdk-fck-nat`](https://github.com/AndrewGuenther/cdk-fck-nat)) that lets me drop in a replacement with a few lines. alterNAT only ships a Terraform module.
+
+If I were already on Terraform — or moving more than ~10 TB/month through NAT Gateway and unwilling to drop a single TCP connection — alterNAT would have been a more even fight. For a single staging environment behind a CDK stack, fck-nat was the obvious pick.
+
+## Links
+
+<LinkPreview href="https://github.com/AndrewGuenther/fck-nat" />
+
+<LinkPreview href="https://fck-nat.dev/stable" />
+
+<LinkPreview href="https://github.com/AndrewGuenther/cdk-fck-nat" />
+
+<LinkPreview href="https://github.com/chime/terraform-aws-alternat" />
+
+<LinkPreview
+  href="https://news.ycombinator.com/item?id=39234968"
+  title="fck-nat author on the alterNAT tradeoff"
+  description='"My big issue with Alternat is that it actively updates the route table which can still cause availability problems."'
+  siteName="Hacker News"
+/>
+
+<LinkPreview
+  href="https://www.reddit.com/r/aws/comments/1j01egs/has_anyone_used_alternat_to_replace_nat_gateway/"
+  title="Has anyone used AlterNAT to replace NAT Gateway?"
+  description="r/aws thread with prod-experience reports from teams running both fck-nat and alterNAT."
+  siteName="Reddit · r/aws"
+/>

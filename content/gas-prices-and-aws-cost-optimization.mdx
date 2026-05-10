@@ -2,7 +2,7 @@
 title: "$7.30 Gas Made Me Optimize My AWS Bill"
 publishedAt: "2026-05-09"
 author: "Alex Sikand"
-summary: "My local gas station is now charging $7.30 a gallon, so I spent the day chasing AWS savings instead of filling up. Here's how I cut about $115 a month across four wins."
+summary: "My local gas station is now charging $7.30 a gallon, so I spent the day chasing AWS savings instead of filling up. Here's how I cut about $116 a month across four wins."
 ---
 
 My local gas station is now charging **$7.30 a gallon**. So instead of filling up, I decided it was time to save some money the only way I know how — aggressively chasing AWS cost optimization.
@@ -11,9 +11,9 @@ Four wins from today, in order.
 
 ## Win 1: Secrets Manager → SSM Parameter Store
 
-Migrated **190 secrets** from AWS Secrets Manager to AWS SSM Parameter Store. I wasn't using auto-rotation or any of the other Secrets-Manager-only features, so this was pure waste.
+Migrated **190 secrets** from AWS Secrets Manager to AWS SSM Parameter Store. Secrets Manager bills **$0.40 per secret per month** for storage, so 190 × $0.40 = $76/month. SSM Parameter Store (Standard tier) is free for storage. I wasn't using auto-rotation or any of the other Secrets-Manager-only features, so this was pure waste.
 
-**Savings: ~$75/month.**
+**Savings: ~$76/month.**
 
 ## Win 2: EC2 right-sizing
 
@@ -59,13 +59,13 @@ VPC Gateway Endpoints for S3 are completely free — no hourly, no per-GB. They 
 
 | Change | Monthly savings |
 | --- | ---: |
-| Secrets Manager → SSM Parameter Store (190 secrets) | $75.00 |
+| Secrets Manager → SSM Parameter Store (190 × $0.40) | $76.00 |
 | DocuSeal EC2: t3.small → t3a.micro → t4g.micro | $10.88 |
 | Staging NAT Gateway → t4g.nano + fck-nat | $29.14 |
 | S3 gateway endpoint (staging + production) | free, eliminates NAT data fees on S3 |
-| **Total** | **~$115/month + variable S3 savings** |
+| **Total** | **~$116/month + variable S3 savings** |
 
-That's roughly **15.8 gallons of gas a month** at current rates, before counting whatever the S3 endpoint claws back. Not bad for a Friday night.
+That's roughly **15.9 gallons of gas a month** at current rates, before counting whatever the S3 endpoint claws back. Not bad for a Friday night.
 
 ## Links
 

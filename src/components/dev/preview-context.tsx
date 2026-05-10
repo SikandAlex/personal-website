@@ -2,6 +2,25 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 
+export type LinkPreviewVariant =
+  | "compact"
+  | "wide-side"
+  | "wide-side-left"
+  | "banner"
+  | "contain"
+  | "text-only";
+
+export const LINK_PREVIEW_VARIANTS: LinkPreviewVariant[] = [
+  "compact",
+  "wide-side",
+  "wide-side-left",
+  "banner",
+  "contain",
+  "text-only",
+];
+
+export const DEFAULT_LINK_PREVIEW_VARIANT: LinkPreviewVariant = "wide-side-left";
+
 type PreviewContextValue = {
   accent: string;
   setAccent: (c: string) => void;
@@ -9,6 +28,8 @@ type PreviewContextValue = {
   setWorkSkills: (v: boolean) => void;
   projectTags: boolean;
   setProjectTags: (v: boolean) => void;
+  linkPreviewVariant: LinkPreviewVariant;
+  setLinkPreviewVariant: (v: LinkPreviewVariant) => void;
 };
 
 const DEFAULTS: PreviewContextValue = {
@@ -18,6 +39,8 @@ const DEFAULTS: PreviewContextValue = {
   setWorkSkills: () => {},
   projectTags: false,
   setProjectTags: () => {},
+  linkPreviewVariant: DEFAULT_LINK_PREVIEW_VARIANT,
+  setLinkPreviewVariant: () => {},
 };
 
 const PreviewContext = createContext<PreviewContextValue>(DEFAULTS);
@@ -26,6 +49,8 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   const [accent, setAccent] = useState<string>("#7C3AED");
   const [workSkills, setWorkSkills] = useState<boolean>(true);
   const [projectTags, setProjectTags] = useState<boolean>(false);
+  const [linkPreviewVariant, setLinkPreviewVariant] =
+    useState<LinkPreviewVariant>(DEFAULT_LINK_PREVIEW_VARIANT);
 
   return (
     <PreviewContext.Provider
@@ -36,6 +61,8 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
         setWorkSkills,
         projectTags,
         setProjectTags,
+        linkPreviewVariant,
+        setLinkPreviewVariant,
       }}
     >
       {children}

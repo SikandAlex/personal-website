@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePreview } from "@/components/dev/preview-context";
+import {
+  DEFAULT_LINK_PREVIEW_VARIANT,
+  LINK_PREVIEW_VARIANTS,
+  usePreview,
+} from "@/components/dev/preview-context";
 
 const DEFAULT_SIZE = 120;
 const DEFAULT_RADIUS = 0;
@@ -21,6 +25,8 @@ export default function LogoControls() {
     setWorkSkills,
     projectTags,
     setProjectTags,
+    linkPreviewVariant,
+    setLinkPreviewVariant,
   } = usePreview();
 
   useEffect(() => {
@@ -135,6 +141,23 @@ export default function LogoControls() {
               className="w-full h-7 cursor-pointer"
             />
           </label>
+          <div className="flex flex-col gap-1.5 text-xs">
+            <span>Link preview layout</span>
+            {LINK_PREVIEW_VARIANTS.map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setLinkPreviewVariant(v)}
+                className={`px-2 py-1 text-xs rounded border transition-colors text-left ${
+                  linkPreviewVariant === v
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background hover:bg-muted"
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
             onClick={() => {
@@ -144,6 +167,7 @@ export default function LogoControls() {
               setAccent(DEFAULT_ACCENT);
               setWorkSkills(true);
               setProjectTags(false);
+              setLinkPreviewVariant(DEFAULT_LINK_PREVIEW_VARIANT);
             }}
             className="text-xs text-muted-foreground hover:text-foreground self-start underline underline-offset-2"
           >

@@ -87,7 +87,7 @@ app.useGlobalFilters(
 
 You keep throwing `BadRequestException`, `NotFoundException`, etc., and clients start seeing well-formed Problem Details on the wire. It also handles the `Retry-After` header per [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110) (for `429`/`503`), ships an optional Swagger decorator, and supports both the Express and Fastify adapters.
 
-For **Hono** — and by extension anything running on the edge (Cloudflare Workers, Deno, Bun, Node) — [`hono-problem-details`](https://github.com/paveg/hono-problem-details) registers as the global error handler:
+For **Hono** — and by extension anything running on the edge (Cloudflare Workers, Deno, Bun, Node) — [`hono-problem-details`](https://github.com/paveg/hono-problem-details), by [Ryota Ikezawa](https://github.com/paveg), registers as the global error handler:
 
 ```ts
 import { problemDetailsHandler } from 'hono-problem-details';
@@ -131,6 +131,14 @@ The libraries above are open-source efforts maintained by individual engineers. 
   image="/people/daniel-edgecombe.png"
   linkedinUrl="https://www.linkedin.com/in/danieledgecombe"
   githubUrl="https://github.com/EdgyEdgemond"
+/>
+
+<PersonCard
+  name="Ryota Ikezawa"
+  role="Senior software engineer — maintains hono-problem-details, the Hono middleware for Problem Details."
+  image="/people/ryota-ikezawa.jpg"
+  linkedinUrl="https://www.linkedin.com/in/xpav"
+  githubUrl="https://github.com/paveg"
 />
 
 <PersonCard

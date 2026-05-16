@@ -55,7 +55,7 @@ export function PersonCard({
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Connect with ${name} on LinkedIn`}
-              className="inline-flex items-center gap-1.5 rounded-md bg-[#0A66C2] px-3 py-1.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#0953a1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="no-underline inline-flex items-center gap-1.5 rounded-md bg-[#0A66C2] px-3 py-1.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#0953a1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <Icons.linkedin className="size-3.5 sm:size-4" />
               Connect on LinkedIn
@@ -67,7 +67,7 @@ export function PersonCard({
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${name} on GitHub`}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="no-underline inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <FaGithub className="size-3.5 sm:size-4" />
               GitHub

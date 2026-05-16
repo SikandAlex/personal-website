@@ -97,7 +97,27 @@ app.onError(problemDetailsHandler());
 
 It has zero runtime dependencies beyond Hono itself, plugs into Zod / Valibot / Standard Schema to produce the validation-error shape above, and ships a typed problem registry so you can define your domain error types once and get compile-time checks at every throw site.
 
-Other frameworks are covered too. Spring Boot ships `ProblemDetail` natively since 6.x, ASP.NET has `ProblemDetails` baked into the controller pipeline, and most Go/Python web frameworks have at least one maintained package. Whichever you pick, the bytes on the wire come out the same shape.
+For **Python**, NRWLDev's [`rfc9457`](https://github.com/NRWLDev/rfc9457) is the core exception library — subclass a base problem class, set a `title`, raise it, and call `.marshal()` to get the RFC-shaped dict. For FastAPI specifically, the companion [`fastapi-problem`](https://pypi.org/project/fastapi-problem/) package wires that into an exception handler so you don't have to:
+
+```python
+from fastapi import FastAPI
+from fastapi_problem.handler import new_exception_handler, add_exception_handler
+from rfc9457 import NotFoundProblem
+
+class UserNotFoundError(NotFoundProblem):
+    title = "User not found."
+
+app = FastAPI()
+add_exception_handler(app, new_exception_handler())
+
+@app.get("/users/{user_id}")
+async def get_user(user_id: str):
+    raise UserNotFoundError(detail=f"No user with id {user_id}.")
+```
+
+Other frameworks are covered too. Spring Boot ships `ProblemDetail` natively since 6.x and ASP.NET has `ProblemDetails` baked into the controller pipeline. Whichever you pick, the bytes on the wire come out the same shape.
+
+If you'd rather work at the *library* layer than the framework layer, there's also a framework-agnostic error catalog in early development: [`JohnAdib/rfc9457`](https://github.com/JohnAdib/rfc9457) ships 39 prebuilt errors with semantic aliases (`errors.client.idNotFound()`, `errors.server.db()`, and so on) and zero runtime dependencies. You construct the error object and still wire the HTTP response yourself outside of its built-in Hono middleware. Worth knowing about, but it's new enough (single-digit stars at the time of writing) that I'd kick the tires before betting on it.
 
 ## Worth adopting?
 
@@ -112,3 +132,11 @@ Probably yes, mostly because the alternative is doing the same design work yours
 <LinkPreview href="https://github.com/Fcmam5/nest-problem-details" />
 
 <LinkPreview href="https://github.com/paveg/hono-problem-details" />
+
+<LinkPreview href="https://github.com/NRWLDev/rfc9457" />
+
+<LinkPreview href="https://pypi.org/project/rfc9457/" />
+
+<LinkPreview href="https://pypi.org/project/fastapi-problem/" />
+
+<LinkPreview href="https://github.com/JohnAdib/rfc9457" />

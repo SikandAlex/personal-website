@@ -69,9 +69,11 @@ In practice, the most common payload that came out of these changes is the valid
 
 One overall problem (`validation-error`), several field-level details, each pointing at the offending location with a [JSON Pointer](https://www.rfc-editor.org/rfc/rfc6901). That's the 9457-blessed pattern.
 
-## A drop-in implementation for NestJS
+## Drop-in implementations
 
-You don't have to hand-roll this. For NestJS specifically, [`nest-problem-details-filter`](https://github.com/Fcmam5/nest-problem-details) wires an exception filter that converts every `HttpException` into an `application/problem+json` response — no controller changes required.
+You don't have to hand-roll this. The Node ecosystem alone has at least two well-maintained options worth knowing about.
+
+For **NestJS**, [`nest-problem-details-filter`](https://github.com/Fcmam5/nest-problem-details) wires an exception filter that converts every `HttpException` into an `application/problem+json` response — no controller changes required.
 
 ```ts
 // main.ts
@@ -84,6 +86,16 @@ app.useGlobalFilters(
 ```
 
 You keep throwing `BadRequestException`, `NotFoundException`, etc., and clients start seeing well-formed Problem Details on the wire. It also handles the `Retry-After` header per [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110) (for `429`/`503`), ships an optional Swagger decorator, and supports both the Express and Fastify adapters.
+
+For **Hono** — and by extension anything running on the edge (Cloudflare Workers, Deno, Bun, Node) — [`hono-problem-details`](https://github.com/paveg/hono-problem-details) registers as the global error handler:
+
+```ts
+import { problemDetailsHandler } from 'hono-problem-details';
+
+app.onError(problemDetailsHandler());
+```
+
+It has zero runtime dependencies beyond Hono itself, plugs into Zod / Valibot / Standard Schema to produce the validation-error shape above, and ships a typed problem registry so you can define your domain error types once and get compile-time checks at every throw site.
 
 Other frameworks are covered too. Spring Boot ships `ProblemDetail` natively since 6.x, ASP.NET has `ProblemDetails` baked into the controller pipeline, and most Go/Python web frameworks have at least one maintained package. Whichever you pick, the bytes on the wire come out the same shape.
 
@@ -99,6 +111,4 @@ Probably yes, mostly because the alternative is doing the same design work yours
 
 <LinkPreview href="https://github.com/Fcmam5/nest-problem-details" />
 
-<LinkPreview href="https://blog.frankel.ch/problem-details-http-apis/" />
-
-<LinkPreview href="https://redocly.com/blog/problem-details-9457" />
+<LinkPreview href="https://github.com/paveg/hono-problem-details" />

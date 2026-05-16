@@ -119,6 +119,8 @@ Other frameworks are covered too. Spring Boot ships `ProblemDetail` natively sin
 
 If you'd rather work at the *library* layer than the framework layer, there's also a framework-agnostic error catalog in early development: [`JohnAdib/rfc9457`](https://github.com/JohnAdib/rfc9457), by [John Adib](https://github.com/JohnAdib), ships 39 prebuilt errors with semantic aliases (`errors.client.idNotFound()`, `errors.server.db()`, and so on) and zero runtime dependencies. You construct the error object and still wire the HTTP response yourself outside of its built-in Hono middleware. Worth knowing about, but it's new enough (single-digit stars at the time of writing) that I'd kick the tires before betting on it.
 
+If you're on standalone **Fastify** specifically, there's also an early-stage [`fastify-rfc9457`](https://github.com/fracabu/fastify-rfc9457) plugin by [Francesco Capurso](https://github.com/fracabu) that wires the Problem Details format into Fastify's reply pipeline and ships built-in i18n for error messages (EN/IT/ES/DE/FR) — same nascent-project caveat applies.
+
 ## Connect with the maintainers
 
 The libraries above are open-source efforts maintained by individual engineers. If you find any of them useful in your stack, the people behind them are worth following.
@@ -137,6 +139,14 @@ The libraries above are open-source efforts maintained by individual engineers. 
   image="/people/john-adib.png"
   linkedinUrl="https://www.linkedin.com/in/MrAdib/"
   githubUrl="https://github.com/JohnAdib"
+/>
+
+<PersonCard
+  name="Francesco Capurso"
+  role="Maintains fastify-rfc9457, a Fastify plugin for Problem Details with built-in error-message i18n."
+  image="/people/francesco-capurso.jpg"
+  linkedinUrl="https://www.linkedin.com/in/francesco-~-capurso-5801031a9/"
+  githubUrl="https://github.com/fracabu"
 />
 
 ## Worth adopting?
@@ -160,3 +170,5 @@ Probably yes, mostly because the alternative is doing the same design work yours
 <LinkPreview href="https://pypi.org/project/fastapi-problem/" />
 
 <LinkPreview href="https://github.com/JohnAdib/rfc9457" />
+
+<LinkPreview href="https://github.com/fracabu/fastify-rfc9457" />

@@ -73,7 +73,7 @@ One overall problem (`validation-error`), several field-level details, each poin
 
 You don't have to hand-roll this. The Node ecosystem alone has at least two well-maintained options worth knowing about.
 
-For **NestJS**, [`nest-problem-details-filter`](https://github.com/Fcmam5/nest-problem-details) wires an exception filter that converts every `HttpException` into an `application/problem+json` response — no controller changes required.
+For **NestJS**, [`nest-problem-details-filter`](https://github.com/Fcmam5/nest-problem-details), by [Abdeldjalil Fortas](https://github.com/Fcmam5), wires an exception filter that converts every `HttpException` into an `application/problem+json` response — no controller changes required.
 
 ```ts
 // main.ts
@@ -126,11 +126,11 @@ If you're on standalone **Fastify** specifically, there's also an early-stage [`
 The libraries above are open-source efforts maintained by individual engineers. If you find any of them useful in your stack, the people behind them are worth following.
 
 <PersonCard
-  name="Daniel Edgecombe"
-  role="Lead Engineer at Narwhal Engineering (NRWLDev) — maintains rfc9457, fastapi-problem, starlette-problem."
-  image="/people/daniel-edgecombe.png"
-  linkedinUrl="https://www.linkedin.com/in/danieledgecombe"
-  githubUrl="https://github.com/EdgyEdgemond"
+  name="Abdeldjalil Fortas"
+  role="Software Engineer at Deutsche Bank, based in Berlin — maintains nest-problem-details-filter, the NestJS exception filter for Problem Details."
+  image="/people/abdeldjalil-fortas.jpg"
+  linkedinUrl="https://www.linkedin.com/in/fcmam5"
+  githubUrl="https://github.com/Fcmam5"
 />
 
 <PersonCard
@@ -139,6 +139,14 @@ The libraries above are open-source efforts maintained by individual engineers. 
   image="/people/ryota-ikezawa.jpg"
   linkedinUrl="https://www.linkedin.com/in/xpav"
   githubUrl="https://github.com/paveg"
+/>
+
+<PersonCard
+  name="Daniel Edgecombe"
+  role="Lead Engineer at Narwhal Engineering (NRWLDev) — maintains rfc9457, fastapi-problem, starlette-problem."
+  image="/people/daniel-edgecombe.png"
+  linkedinUrl="https://www.linkedin.com/in/danieledgecombe"
+  githubUrl="https://github.com/EdgyEdgemond"
 />
 
 <PersonCard

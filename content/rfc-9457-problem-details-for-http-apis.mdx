@@ -1,0 +1,104 @@
+---
+title: "RFC 9457: A Standard Shape for HTTP API Errors"
+publishedAt: "2026-05-16"
+author: "Alex Sikand"
+summary: "RFC 9457 (which obsoleted RFC 7807 in 2023) gives HTTP APIs a standard, machine-readable error format. Here's what's in the spec, what changed from 7807, and a drop-in NestJS filter that implements it."
+---
+
+Every HTTP API eventually invents its own error shape. One service returns `{ "error": "..." }`, the next returns `{ "code": 42, "message": "..." }`, the third puts everything in the status text. Clients end up writing per-service adapters for what should be the most boring part of an API.
+
+[**RFC 9457 — Problem Details for HTTP APIs**](https://www.rfc-editor.org/rfc/rfc9457) is the IETF's answer to this. It was published in July 2023 and obsoletes [RFC 7807](https://www.rfc-editor.org/rfc/rfc7807) (March 2016). The two are intentionally backward-compatible — if you already speak 7807, you already speak 9457.
+
+## What the spec actually defines
+
+A small JSON object served under the media type `application/problem+json` (or `application/problem+xml` for the XML serialization). The five standard members are:
+
+| Field | Required | What it is |
+| --- | :---: | --- |
+| `type` | no\* | A URI identifying the problem *type*. Should ideally dereference to human-readable docs. Defaults to `"about:blank"`. |
+| `title` | no\* | A short, human-readable summary of the problem type. Shouldn't change per occurrence. |
+| `status` | no | The HTTP status code, duplicated in the body so it survives proxies that rewrite responses. |
+| `detail` | no | A human-readable explanation specific to *this* occurrence. |
+| `instance` | no | A URI identifying the specific occurrence (often the failing request path). |
+
+\*Technically all members are optional, but consumers are told to treat `type` as the primary identifier and to fall back to `title` when they don't recognize the URI.
+
+You're also allowed — and encouraged — to add **extension members** for whatever your domain needs. Unknown extensions must be ignored by clients, so adding a `trace_id` or `balance` field doesn't break anyone.
+
+A canonical example, lifted from the RFC itself:
+
+```http
+HTTP/1.1 403 Forbidden
+Content-Type: application/problem+json
+Content-Language: en
+
+{
+  "type": "https://example.com/probs/out-of-credit",
+  "title": "You do not have enough credit.",
+  "status": 403,
+  "detail": "Your current balance is 30, but that costs 50.",
+  "instance": "/account/12345/msgs/abc",
+  "balance": 30,
+  "accounts": ["/account/12345", "/account/67890"]
+}
+```
+
+`balance` and `accounts` are extension members. A client that doesn't know about them just ignores them; one that does can use them to render a useful error UI without a second round-trip.
+
+## What 9457 changed from 7807
+
+Three things, all in [Appendix D](https://www.rfc-editor.org/rfc/rfc9457#appendix-D):
+
+1. **A problem type registry.** Section 4.2 introduces an IANA registry of common problem type URIs so multiple APIs can converge on the same `type` for the same situation instead of each minting their own.
+2. **Clearer guidance for multiple problems.** 7807 left a door open to returning a list of unrelated problems (and the `207 Multi-Status` pattern that often came with it). 9457 closes that door — a problem details response should describe **one** problem. Related sub-errors (like field-level validation failures) still belong in an extension array — typically called `errors` — but they should share a single overall type.
+3. **Non-dereferenceable type URIs.** Section 3.1.1 explicitly OKs schemes like `tag:` for cases where you don't want to (or can't) host docs at the URL.
+
+In practice, the most common payload that came out of these changes is the validation-error shape:
+
+```json
+{
+  "type": "https://example.net/validation-error",
+  "title": "Your request is invalid.",
+  "status": 422,
+  "errors": [
+    { "detail": "must be a positive integer", "pointer": "#/age" },
+    { "detail": "must be 'green', 'red' or 'blue'", "pointer": "#/profile/color" }
+  ]
+}
+```
+
+One overall problem (`validation-error`), several field-level details, each pointing at the offending location with a [JSON Pointer](https://www.rfc-editor.org/rfc/rfc6901). That's the 9457-blessed pattern.
+
+## A drop-in implementation for NestJS
+
+You don't have to hand-roll this. For NestJS specifically, [`nest-problem-details-filter`](https://github.com/Fcmam5/nest-problem-details) wires an exception filter that converts every `HttpException` into an `application/problem+json` response — no controller changes required.
+
+```ts
+// main.ts
+import { HttpAdapterHost } from '@nestjs/core';
+import { HttpExceptionFilter } from 'nest-problem-details-filter';
+
+app.useGlobalFilters(
+  new HttpExceptionFilter(app.get(HttpAdapterHost)),
+);
+```
+
+You keep throwing `BadRequestException`, `NotFoundException`, etc., and clients start seeing well-formed Problem Details on the wire. It also handles the `Retry-After` header per [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110) (for `429`/`503`), ships an optional Swagger decorator, and supports both the Express and Fastify adapters.
+
+Other frameworks are covered too. Spring Boot ships `ProblemDetail` natively since 6.x, ASP.NET has `ProblemDetails` baked into the controller pipeline, and most Go/Python web frameworks have at least one maintained package. Whichever you pick, the bytes on the wire come out the same shape.
+
+## Worth adopting?
+
+Probably yes, mostly because the alternative is doing the same design work yourself for worse interop. You were going to invent *some* error shape regardless. Picking 9457 means the shape is documented, the libraries exist, and anyone who's hit another 9457 API already knows how to parse it. A few hours wiring up a filter (or a middleware, or whatever your framework calls it) buys you the rest for free.
+
+## Links
+
+<LinkPreview href="https://www.rfc-editor.org/rfc/rfc9457" />
+
+<LinkPreview href="https://www.rfc-editor.org/rfc/rfc7807" />
+
+<LinkPreview href="https://github.com/Fcmam5/nest-problem-details" />
+
+<LinkPreview href="https://blog.frankel.ch/problem-details-http-apis/" />
+
+<LinkPreview href="https://redocly.com/blog/problem-details-9457" />

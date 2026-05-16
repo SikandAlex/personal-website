@@ -115,7 +115,24 @@ async def get_user(user_id: str):
     raise UserNotFoundError(detail=f"No user with id {user_id}.")
 ```
 
-Other frameworks are covered too. Spring Boot ships `ProblemDetail` natively since 6.x and ASP.NET has `ProblemDetails` baked into the controller pipeline. Whichever you pick, the bytes on the wire come out the same shape.
+If you'd rather skip the third-party-package question entirely, [Litestar](https://github.com/litestar-org/litestar) (Python's high-performance ASGI framework) ships first-party RFC 9457 support via its built-in `ProblemDetailsPlugin`. Register it on the app and flip one config flag to auto-convert every `HTTPException` into a Problem Details response:
+
+```python
+from litestar import Litestar
+from litestar.plugins.problem_details import ProblemDetailsPlugin, ProblemDetailsConfig
+
+app = Litestar(
+    plugins=[
+        ProblemDetailsPlugin(
+            ProblemDetailsConfig(enable_for_all_http_exceptions=True),
+        ),
+    ],
+)
+```
+
+You can also pass an `exception_to_problem_detail_map` to wire your own domain exceptions into the same response shape.
+
+Other major frameworks have first-party support too: Spring Boot ships `ProblemDetail` natively since 6.x, and ASP.NET has `ProblemDetails` baked into the controller pipeline. Whichever you pick, the bytes on the wire come out the same shape.
 
 If you'd rather work at the *library* layer than the framework layer, there's also a framework-agnostic error catalog in early development: [`JohnAdib/rfc9457`](https://github.com/JohnAdib/rfc9457), by [John Adib](https://github.com/JohnAdib), ships 39 prebuilt errors with semantic aliases (`errors.client.idNotFound()`, `errors.server.db()`, and so on) and zero runtime dependencies. You construct the error object and still wire the HTTP response yourself outside of its built-in Hono middleware. Worth knowing about, but it's new enough (single-digit stars at the time of writing) that I'd kick the tires before betting on it.
 
@@ -184,6 +201,8 @@ Probably yes, mostly because the alternative is doing the same design work yours
 <LinkPreview href="https://pypi.org/project/rfc9457/" />
 
 <LinkPreview href="https://pypi.org/project/fastapi-problem/" />
+
+<LinkPreview href="https://github.com/litestar-org/litestar" />
 
 <LinkPreview href="https://github.com/JohnAdib/rfc9457" />
 

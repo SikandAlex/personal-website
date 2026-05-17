@@ -9,8 +9,9 @@ import ContactSection from "@/components/section/contact-section";
 import ProjectsSection from "@/components/section/projects-section";
 import WorkSectionTimeline from "@/components/section/work-section-timeline";
 // import GitHubActivity from "@/components/section/github-activity"; // hidden until contribution count is fuller
-import { ArrowUpRight, MapPin } from "lucide-react";
+import { ArrowUpRight, ChevronRight, MapPin } from "lucide-react";
 import { Icons } from "@/components/icons";
+import { allPosts } from "content-collections";
 
 const BLUR_FADE_DELAY = 0.04;
 
@@ -71,6 +72,59 @@ export default function Page() {
                 {DATA.summary}
               </Markdown>
             </div>
+          </BlurFade>
+        </div>
+      </section>
+      <section id="writing">
+        <div className="flex min-h-0 flex-col gap-y-6">
+          <BlurFade delay={BLUR_FADE_DELAY * 4.5}>
+            <h2 className="text-xl font-bold">Writing</h2>
+          </BlurFade>
+          <div className="flex flex-col gap-5">
+            {DATA.featuredPostSlugs.map((slug, idx) => {
+              const post = allPosts.find(
+                (p) => p._meta.path.replace(/\.mdx$/, "") === slug
+              );
+              if (!post) return null;
+              return (
+                <BlurFade
+                  key={slug}
+                  delay={BLUR_FADE_DELAY * 4.8 + idx * 0.05}
+                >
+                  <Link
+                    className="flex items-start gap-x-2 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    href={`/blog/${slug}`}
+                  >
+                    <span className="text-xs font-mono tabular-nums font-medium mt-[5px]">
+                      {String(idx + 1).padStart(2, "0")}.
+                    </span>
+                    <div className="flex flex-col gap-y-2 flex-1">
+                      <p className="tracking-tight text-lg font-medium">
+                        <span className="group-hover:text-foreground transition-colors">
+                          {post.title}
+                          <ChevronRight
+                            className="ml-1 inline-block size-4 stroke-3 text-muted-foreground opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0"
+                            aria-hidden
+                          />
+                        </span>
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {post.publishedAt}
+                      </p>
+                    </div>
+                  </Link>
+                </BlurFade>
+              );
+            })}
+          </div>
+          <BlurFade delay={BLUR_FADE_DELAY * 5}>
+            <Link
+              href="/blog"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 group w-fit"
+            >
+              View all posts
+              <ChevronRight className="size-3 group-hover:translate-x-px transition-transform" />
+            </Link>
           </BlurFade>
         </div>
       </section>

@@ -51,6 +51,11 @@ export const DATA = {
   summary:
     "Full-stack engineer who ships production AI from architecture to revenue. Built CallSaver's voice AI platform end-to-end (paying customers, sole engineer), shipped AWS infrastructure for 1,000+ enterprise dealerships at Impel, and productionized computer vision models at Silk Labs.",
   avatarUrl: "/alex-sikand.png",
+  featuredPostSlugs: [
+    "optimal-python-stack-2026",
+    "gas-prices-and-aws-cost-optimization",
+    "rfc-9457-problem-details-for-http-apis",
+  ],
   skillGroups: [
     {
       name: "Languages",

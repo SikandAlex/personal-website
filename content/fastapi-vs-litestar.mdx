@@ -1,0 +1,101 @@
+---
+title: "FastAPI vs Litestar in 2026: Which Python API Framework to Pick"
+publishedAt: "2026-05-13"
+author: "Alex Sikand"
+summary: "Litestar has the better feature set on paper — DTOs, msgspec, layered controllers, a real plugin system. FastAPI has roughly 12x the stars and a corresponding lead in LLM training data. Here's how that math actually plays out for a new project."
+---
+
+If you're starting a new Python API project in 2026, the realistic shortlist is [FastAPI](https://github.com/fastapi/fastapi) or [Litestar](https://github.com/litestar-org/litestar) (formerly Starlite). Both are async ASGI frameworks driven by Python type hints, both auto-generate OpenAPI docs, both have decent testing utilities and active maintainers.
+
+On paper the choice should be easy — Litestar wins most per-feature comparisons. The actual answer is more interesting than that, and the deciding factor in 2026 isn't on either project's feature list.
+
+## GitHub at a glance
+
+Stats pulled on 2026-05-16:
+
+| | FastAPI | Litestar |
+| --- | ---: | ---: |
+| Stars | 98,261 | 8,220 |
+| Forks | 9,303 | 550 |
+| Contributors | ~459 | ~271 |
+| Created | Dec 2018 | Dec 2021 |
+| Latest release | `0.136.1` (Apr 2026) | `2.21.1` (Mar 2026); `3.0.0b0` in flight |
+| License | MIT | MIT |
+| Min Python | 3.10 | 3.11 |
+| PyPI status | `4 - Beta` | `5 - Production/Stable` |
+
+A few caveats on those numbers. FastAPI's open-issue count (13) is famously low because the maintainers route most things to Discussions, so Litestar's 218 isn't really a quality gap. FastAPI is still on `0.x` after seven years; Litestar is on `2.x` stable with a `3.0` beta. And a chunk of FastAPI's commit count comes from Tiangolo's translation/docs bot, so engineering velocity between the two is closer than the raw graph suggests.
+
+## Design philosophy
+
+FastAPI is a microframework focused on developer ergonomics via Python type hints and Pydantic. It's built on Starlette plus Pydantic v2, and most non-trivial concerns (auth providers, DB sessions, background workers) get left to the user or to third-party packages. The selling point is how quickly you can stand up a typed, documented API from a handful of decorated functions.
+
+Litestar is explicitly *not* a microframework, and its own docs say so. It ships the kind of first-class primitives that FastAPI users usually reach for plugins to get: class-based controllers, DTOs, channels for pub-sub, a stores subsystem for sessions and cache, a repository pattern, JWT and session auth out of the box, a real plugin protocol, and a layered architecture where each layer (app → router → controller → handler) can declare its own guards, middleware, and dependencies.
+
+Litestar also dropped the Starlette dependency during its 2023 rename and replaced Pydantic with [`msgspec`](https://jcristharif.com/msgspec/) as the default serialization library. Pydantic is now one of several optional plugins rather than a hard dependency.
+
+## Feature comparison
+
+| Area | FastAPI | Litestar |
+| --- | --- | --- |
+| Validation | Pydantic v2 only (hard dep) | msgspec by default; Pydantic, attrs, dataclasses, TypedDict all pluggable |
+| Routing | Decorators on `app` / `APIRouter` | Decorators plus class-based `Controller`s and nested `Router`s with layered config inheritance |
+| Dependency injection | `Depends()` on function parameters | Named providers declarable at any layer; per-layer overrides |
+| DTOs | None — maintain parallel Pydantic input/output models | First-class: include/exclude/rename fields, codegen from SQLAlchemy/msgspec/Pydantic/attrs |
+| WebSockets | Yes (Starlette) | Yes + `channels` package with memory/Redis/Postgres backends |
+| Middleware built-ins | CORS | Rate-limit, CORS, CSRF, compression (brotli/zstd/gzip), logging, session |
+| OpenAPI UIs | Swagger + ReDoc | Swagger + ReDoc + Stoplight Elements + RapiDoc |
+| Auth | OAuth2 / JWT / Basic / scopes via `Security()` | JWT and session-based auth out of the box; separate guards primitive |
+| ORM story | User wires SQLAlchemy themselves | `sqlalchemy` extra pulls in [`advanced-alchemy`](https://github.com/litestar-org/advanced-alchemy) plus a repository pattern |
+| Plugin system | Informal (deps + middleware) | Formal protocols: Serialization / Init / DI / OpenAPI plugins |
+| CLI | `fastapi dev` / `run` via `fastapi-cli` extra | `litestar` CLI in core (run/info/routes/sessions/schema) |
+| Governance | Single-BDFL (Tiangolo and a small team) | Multi-maintainer org |
+
+The single biggest architectural difference: FastAPI is welded to Pydantic v2, and you can't meaningfully use it without. Litestar treats Pydantic as one of several optional plugins, with msgspec as the default fast path. If serialization throughput matters, or you'd rather not pin your framework to Pydantic's release schedule, that gap is hard to argue with.
+
+## The LLM training data argument
+
+This is where the per-feature comparison stops mattering as much as you'd think.
+
+FastAPI has roughly 12x Litestar's stars, which is a rough proxy for how much FastAPI code, how many tutorials, and how many Stack Overflow answers exist for each framework in any modern LLM's training corpus. Most engineers spend a sizable chunk of their day pair-programming with an LLM in some form. The framework your LLM knows better is the framework you'll ship faster in.
+
+You feel that in three places. First, hallucinated APIs are rarer with FastAPI: ask any major model to wire up auth and it'll usually produce working code on the first try, where the same prompt for Litestar often mixes API versions or invents decorator names that don't exist. Debugging is faster too — pasting a FastAPI stack trace into a chat returns a confident, correct answer almost every time, where Litestar errors more often get pattern-matched against generic ASGI advice. And agent loops compound the difference, because each step in a long sequence needs to be locally correct.
+
+This won't last forever. Litestar's documentation is good and the gap will close as more code gets written. But for a project starting today, you're paying a real productivity tax to use the less-known framework, on top of any onboarding or hiring tax.
+
+Worth being honest about which Litestar features the gap actually hurts. The basics (routes, dependency providers, JWT auth) are well-documented enough that any current model handles them. The pain shows up in the corners — a custom DTO factory, a layered guard, a non-trivial plugin. Which is to say, exactly the features that motivated picking Litestar in the first place.
+
+## Honorable mention: Falcon
+
+[Falcon](https://github.com/falconry/falcon) deserves a brief mention but isn't really in the same conversation. It's older than both (started 2012, 9.8k stars), has zero runtime dependencies, supports both WSGI and ASGI, and is built around resource classes with `on_get` / `on_post` methods rather than decorated functions. No built-in validation, no built-in OpenAPI, no DI, no auth — the framework stops at routing, middleware, and HTTP plumbing.
+
+That minimalism has won it a long list of production users: LinkedIn, PayPal, Rackspace, the Wikimedia Foundation, OpenStack, EMC, Wargaming, Opera Software, Hurricane Electric, Leadpages, Cronitor, and GOVCERT.LU all run (or have run) Falcon in production. The infrastructure and public-sector lineage there — OpenStack and Wikimedia in particular — is the giveaway. Falcon shows up where teams want a small, predictable HTTP layer they can drop into a larger system and forget about.
+
+Pick Falcon when you need WSGI, when your dependency surface is a hard constraint (security review, air-gapped, Lambda cold start), or when you want a strictly SemVer-bound framework that won't break you for years at a time. Otherwise it's optimizing for a different set of trade-offs than the two frameworks above.
+
+## So which should you pick?
+
+The default is FastAPI. The LLM-fluency gap decides it for most teams in 2026, and Litestar's per-feature wins — real as they are — don't compensate for the daily tax of fighting your AI assistant. Add the larger community, more tutorial coverage, and easier hiring, and the math tilts pretty hard.
+
+Flip to Litestar when one of these is true:
+
+- You have a specific need it uniquely solves — WebSocket pub-sub at scale via the `channels` package, heavy DTO transformations from SQLAlchemy models, or strong opinions against Pydantic in your dependency tree.
+- You're building a larger app where class-based controllers and per-layer config materially reduce duplication.
+- Your team is senior enough that LLM autocomplete quality isn't a meaningful factor day-to-day.
+- You care about multi-maintainer governance over a single-BDFL model for long-term project health.
+
+The first reason is the only one I'd treat as decisive on its own. The rest are real, but softer.
+
+For a generic new project in 2026 — CRUD plus auth plus a Postgres database — pick FastAPI, lean on the ecosystem, and revisit if you outgrow it.
+
+## Links
+
+<LinkPreview href="https://github.com/fastapi/fastapi" />
+
+<LinkPreview href="https://fastapi.tiangolo.com/" />
+
+<LinkPreview href="https://github.com/litestar-org/litestar" />
+
+<LinkPreview href="https://docs.litestar.dev/latest/" />
+
+<LinkPreview href="https://github.com/falconry/falcon" />

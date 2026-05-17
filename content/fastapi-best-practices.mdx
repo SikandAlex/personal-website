@@ -1,0 +1,606 @@
+---
+title: "Production FastAPI: A Best Practices Field Guide"
+publishedAt: "2026-05-15"
+author: "Alex Sikand"
+summary: "An annotated walkthrough of zhanymkanov's fastapi-best-practices — the project layout, async rules, Pydantic patterns, dependency tricks, and DB conventions worth borrowing — with extra commentary, modern (2026) versions, and the gotchas the repo only hints at."
+---
+
+[zhanymkanov/fastapi-best-practices](https://github.com/zhanymkanov/fastapi-best-practices) is one of the most useful FastAPI documents on GitHub — a short, opinionated list of conventions distilled from running real production services. It's been kept current (Pydantic v2, SQLAlchemy 2.0, ruff, the Annotated dependency form) and now ships an [`AGENTS.md`](https://github.com/zhanymkanov/fastapi-best-practices/blob/master/AGENTS.md) variant for LLMs.
+
+This post is a walkthrough of every rule in that repo, with my own commentary, expanded examples, and the failure modes each rule is actually defending against. Treat it as a companion piece, not a replacement — go upvote the original.
+
+## 1. Structure by domain, not by file type
+
+The default tutorial structure (`models/`, `routers/`, `schemas/` at the top level) breaks the moment your app has more than two real bounded contexts. You end up with a `models.py` that imports five unrelated domains, circular import problems whenever auth needs to know about posts, and PR diffs that touch every directory for a single feature.
+
+Group by domain instead — one package per bounded context, each with the same internal shape:
+
+```
+src/
+├── auth/
+│   ├── router.py        # API endpoints
+│   ├── schemas.py       # Pydantic models (input/output)
+│   ├── models.py        # SQLAlchemy ORM models
+│   ├── service.py       # business logic
+│   ├── dependencies.py  # FastAPI Depends() functions
+│   ├── config.py        # domain-scoped BaseSettings
+│   ├── constants.py     # error codes, magic strings
+│   ├── exceptions.py    # domain-specific exceptions
+│   └── utils.py         # helpers with no business logic
+├── posts/
+│   └── …same shape…
+├── config.py            # global BaseSettings
+├── database.py          # async engine + session factory
+├── exceptions.py        # shared base exceptions
+└── main.py              # FastAPI app + lifespan
+```
+
+When one domain needs another, import with an explicit module name — never `from src.auth import *`:
+
+```python
+from src.auth import constants as auth_constants
+from src.notifications import service as notifications_service
+from src.posts.constants import ErrorCode as PostsErrorCode
+```
+
+**Why this matters in practice:** a junior on the team can open `src/posts/` and see the whole feature in seven files without bouncing between three top-level directories. New features become new packages instead of cross-cutting changes. And the explicit-import rule means `grep -r "notifications_service"` actually finds every call site, which becomes a lifesaver during refactors.
+
+## 2. Know exactly when to use `async def` vs `def`
+
+This is the single biggest footgun for new FastAPI users. The rule:
+
+| Route does this                       | Use                                            |
+|---------------------------------------|------------------------------------------------|
+| `await`-able non-blocking I/O         | `async def`                                    |
+| Blocking I/O (no async client exists) | `def` (FastAPI runs it in a threadpool)        |
+| Mix of both                           | `async def` + `run_in_threadpool` for the sync part |
+| CPU-bound work (>~50 ms)              | Offload to a worker process (Celery / RQ / Arq) |
+
+The three-routes demo from the repo is the clearest illustration I've seen:
+
+```python
+import asyncio, time
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get("/terrible-ping")
+async def terrible_ping():
+    time.sleep(10)          # blocks the entire event loop for 10s
+    return {"pong": True}
+
+@router.get("/good-ping")
+def good_ping():
+    time.sleep(10)          # blocks one threadpool worker, not the loop
+    return {"pong": True}
+
+@router.get("/perfect-ping")
+async def perfect_ping():
+    await asyncio.sleep(10) # yields control; loop keeps serving requests
+    return {"pong": True}
+```
+
+`/terrible-ping` is the version that takes down production. Because the route is `async`, FastAPI does *not* offload it — it expects you to only `await` non-blocking work. A `time.sleep`, a `requests.get`, a `psycopg2` query: any of them will freeze every other request on that worker for the duration.
+
+**Commentary worth adding to the original:** the default Starlette threadpool size is 40. If you lean on sync routes for everything because "they just work," you'll cap your single-process concurrency at 40 and not understand why your service starts queueing under load. Pick `async def` whenever a real async client exists (`httpx`, `asyncpg`, `aiobotocore`, `redis.asyncio`), and use sync routes only when the library leaves you no choice.
+
+For CPU-bound work — image processing, PDF generation, ML inference, anything that pegs a core — neither option saves you. The GIL means threads don't help, and `await` doesn't help because there's nothing external to wait on. Push it onto a real worker process.
+
+## 3. Use Pydantic excessively
+
+Pydantic v2 isn't just "the validation library." It's the cheapest place in your app to enforce invariants, because validation that lives in a schema runs automatically on every request that touches it.
+
+```python
+from enum import StrEnum
+from pydantic import AnyUrl, BaseModel, EmailStr, Field
+
+class MusicBand(StrEnum):
+    AEROSMITH = "AEROSMITH"
+    QUEEN = "QUEEN"
+    ACDC = "AC/DC"
+
+class UserBase(BaseModel):
+    first_name: str = Field(min_length=1, max_length=128)
+    username: str = Field(min_length=1, max_length=128, pattern="^[A-Za-z0-9-_]+$")
+    email: EmailStr
+    age: int = Field(ge=18)
+    favorite_band: MusicBand | None = None
+    website: AnyUrl | None = None
+```
+
+Every constraint here is also a piece of documentation that ends up in your OpenAPI schema and a test you don't have to write. The frontend gets a 422 with a specific field path; the database never sees a malformed row. The alternative — defensive `if not …: raise HTTPException(400)` calls scattered through your routes — is what you write when you don't trust Pydantic to do its job.
+
+## 4. Have one custom base model
+
+Pinning down a single `CustomModel` class lets you change global behavior in one place — datetime formatting being the obvious one, because the default isoformat varies by Python version and trips up JS clients:
+
+```python
+from datetime import datetime
+from typing import Any
+from zoneinfo import ZoneInfo
+
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel, ConfigDict, field_serializer
+
+class CustomModel(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    @field_serializer("*", when_used="json", check_fields=False)
+    def _serialize_datetimes(self, value: Any) -> Any:
+        if isinstance(value, datetime):
+            if value.tzinfo is None:
+                value = value.replace(tzinfo=ZoneInfo("UTC"))
+            return value.strftime("%Y-%m-%dT%H:%M:%S%z")
+        return value
+
+    def serializable_dict(self, **kwargs):
+        return jsonable_encoder(self.model_dump())
+```
+
+Now every schema in your app emits `2026-05-16T09:30:00+0000` instead of `2026-05-16T09:30:00`, and your iOS team stops opening tickets about timezone bugs.
+
+## 5. Decouple `BaseSettings` by domain
+
+One giant `Settings` class for the whole app is fine until it isn't. The auth module imports it for JWT secrets, the storage module imports it for S3 creds, the worker imports it for the Redis URL, and now every test fixture has to provide every environment variable in the universe just to construct a settings object.
+
+Split it:
+
+```python
+# src/auth/config.py
+from datetime import timedelta
+from pydantic_settings import BaseSettings
+
+class AuthConfig(BaseSettings):
+    JWT_ALG: str
+    JWT_SECRET: str
+    JWT_EXP: int = 5  # minutes
+    REFRESH_TOKEN_KEY: str
+    REFRESH_TOKEN_EXP: timedelta = timedelta(days=30)
+    SECURE_COOKIES: bool = True
+
+auth_settings = AuthConfig()
+
+
+# src/config.py
+from pydantic import PostgresDsn, RedisDsn
+from pydantic_settings import BaseSettings
+from src.constants import Environment
+
+class Config(BaseSettings):
+    DATABASE_URL: PostgresDsn
+    REDIS_URL: RedisDsn
+    SITE_DOMAIN: str = "myapp.com"
+    ENVIRONMENT: Environment = Environment.PRODUCTION
+    SENTRY_DSN: str | None = None
+    CORS_ORIGINS: list[str]
+    APP_VERSION: str = "1.0"
+
+settings = Config()
+```
+
+This pairs nicely with rule #1 — each domain package owns the env vars it needs, and your global `config.py` only holds genuinely cross-cutting values.
+
+## 6. Treat Dependencies as more than dependency injection
+
+The FastAPI docs frame `Depends()` as DI, which undersells it. A dependency is the cleanest place in the framework to put *request validation that needs I/O* — checking that a resource exists, that the caller owns it, that some external system is in the right state.
+
+```python
+# dependencies.py
+async def valid_post_id(post_id: UUID4) -> dict[str, Any]:
+    post = await service.get_by_id(post_id)
+    if not post:
+        raise PostNotFound()
+    return post
+
+# router.py
+@router.get("/posts/{post_id}", response_model=PostResponse)
+async def get_post_by_id(post: dict[str, Any] = Depends(valid_post_id)):
+    return post
+
+@router.put("/posts/{post_id}", response_model=PostResponse)
+async def update_post(
+    update_data: PostUpdate,
+    post: dict[str, Any] = Depends(valid_post_id),
+):
+    return await service.update(id=post["id"], data=update_data)
+
+@router.get("/posts/{post_id}/reviews", response_model=list[ReviewResponse])
+async def get_post_reviews(post: dict[str, Any] = Depends(valid_post_id)):
+    return await reviews_service.get_by_post_id(post["id"])
+```
+
+Three routes, one place where "post must exist" is enforced, one test to write instead of three. When you eventually need to add soft-delete handling or a permission check, you change one function.
+
+## 7. Chain dependencies and lean on the per-request cache
+
+Dependencies can depend on other dependencies, and FastAPI caches each one *per request* by default. So you can compose small functions without worrying that `parse_jwt_data` will run three times:
+
+```python
+from fastapi.security import OAuth2PasswordBearer
+import jwt
+from jwt.exceptions import InvalidTokenError
+
+async def parse_jwt_data(
+    token: str = Depends(OAuth2PasswordBearer(tokenUrl="/auth/token")),
+) -> dict[str, Any]:
+    try:
+        payload = jwt.decode(token, "JWT_SECRET", algorithms=["HS256"])
+    except InvalidTokenError:
+        raise InvalidCredentials()
+    return {"user_id": payload["id"]}
+
+async def valid_owned_post(
+    post: Mapping = Depends(valid_post_id),
+    token_data: dict = Depends(parse_jwt_data),
+) -> Mapping:
+    if post["creator_id"] != token_data["user_id"]:
+        raise UserNotOwner()
+    return post
+
+async def valid_active_creator(
+    token_data: dict = Depends(parse_jwt_data),
+):
+    user = await users_service.get_by_id(token_data["user_id"])
+    if not user["is_active"]:
+        raise UserIsBanned()
+    if not user["is_creator"]:
+        raise UserNotCreator()
+    return user
+
+@router.get("/users/{user_id}/posts/{post_id}", response_model=PostResponse)
+async def get_user_post(
+    post: Mapping = Depends(valid_owned_post),
+    user: Mapping = Depends(valid_active_creator),
+):
+    return post
+```
+
+`parse_jwt_data` shows up in two transitive paths from this route, but runs once per request. That cache also means you can chain validation cheaply: `valid_post_id` → `valid_owned_post` → `valid_published_post` and similar towers don't multiply your DB hits.
+
+The footgun: the cache key is the dependency callable + its resolved arguments. If you wrap a dependency in a closure or pass `use_cache=False`, you lose the savings.
+
+## 8. Prefer `async` dependencies
+
+It's tempting to write quick dependencies as `def` since they don't await anything. Don't. Sync dependencies, like sync routes, get bounced into the threadpool — and the per-call overhead for a tiny "check this header is present" function isn't worth it. Default to `async def` everywhere; you'll never have to think about it again.
+
+## 9. Follow REST so dependencies compose
+
+This rule sounds aesthetic but it's actually about being able to reuse the dependencies from rule #6. If you name path parameters consistently across endpoints — always `profile_id`, even when the route concept is "creator" — the same dependency works everywhere:
+
+```python
+# src/profiles/dependencies.py
+async def valid_profile_id(profile_id: UUID4) -> Mapping:
+    profile = await service.get_by_id(profile_id)
+    if not profile:
+        raise ProfileNotFound()
+    return profile
+
+# src/creators/dependencies.py
+async def valid_creator_id(profile: Mapping = Depends(valid_profile_id)) -> Mapping:
+    if not profile["is_creator"]:
+        raise ProfileNotCreator()
+    return profile
+
+# src/creators/router.py
+@router.get("/creators/{profile_id}", response_model=ProfileResponse)
+async def get_creator_profile(creator: Mapping = Depends(valid_creator_id)):
+    return creator
+```
+
+Using `creator_id` in the path would have forced you to write a near-duplicate `valid_creator_id` that re-does the lookup `valid_profile_id` already covers.
+
+## 10. Know that `response_model` re-validates
+
+This one bites people who try to optimize by returning a Pydantic instance from a route. FastAPI does *not* skip validation just because what you returned already matches the schema. It runs `jsonable_encoder` on your object, then re-instantiates the `response_model`, then serializes that to JSON.
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel, model_validator
+
+app = FastAPI()
+
+class ProfileResponse(BaseModel):
+    @model_validator(mode="after")
+    def debug_usage(self):
+        print("created pydantic model")
+        return self
+
+@app.get("/", response_model=ProfileResponse)
+async def root():
+    return ProfileResponse()
+```
+
+You'll see `created pydantic model` print **twice** per request. For a heavily-trafficked endpoint with a complex response, that doubles your Pydantic CPU cost.
+
+Two ways to fix it, depending on what you want:
+
+- If you don't need validation, return a `dict` and set `response_model=None`, or use `response_class=ORJSONResponse` and skip the model entirely for hot paths.
+- If you need validation, accept the overhead — it's the price of guaranteeing your responses match your schema.
+
+## 11. Run sync SDKs in a threadpool, not directly
+
+If you genuinely can't avoid a sync SDK from inside an async route, wrap the call in `run_in_threadpool` — don't call it directly:
+
+```python
+from fastapi import FastAPI
+from fastapi.concurrency import run_in_threadpool
+from my_sync_library import SyncAPIClient
+
+app = FastAPI()
+
+@app.get("/")
+async def call_my_sync_library():
+    my_data = await service.get_my_data()
+    client = SyncAPIClient()
+    return await run_in_threadpool(client.make_request, data=my_data)
+```
+
+Calling `client.make_request(...)` directly inside an `async def` is the same mistake as `/terrible-ping` — you'll block the event loop for the duration of the HTTP call. `run_in_threadpool` is the explicit "I know this is sync, please offload it" escape hatch.
+
+## 12. `BackgroundTasks` is a footgun, not a job queue
+
+FastAPI's `BackgroundTasks` runs your function *after the response is sent, in the same worker process*. No retries, no persistence, no visibility, no scheduling. If the worker is restarted (deploy, OOM, autoscale), the task is gone.
+
+| Use `BackgroundTasks` when…              | Use Celery / Arq / RQ when…                    |
+|------------------------------------------|------------------------------------------------|
+| Task is short (< 1 second)               | Task takes seconds to minutes                  |
+| Failure can be silently dropped          | You need retries or dead-letter handling       |
+| In-process (log a row, send a Slack msg) | CPU-heavy or needs a separate worker pool     |
+| You don't need scheduling                | You need cron, ETA, or rate limiting           |
+
+```python
+from fastapi import BackgroundTasks
+
+@router.post("/signup")
+async def signup(data: SignupIn, bg: BackgroundTasks):
+    user = await service.create_user(data)
+    bg.add_task(send_welcome_email, user.email)  # fire-and-forget, in-process
+    return user
+```
+
+The rule from the original repo says it best: **if you'd page someone when the task is lost, it doesn't belong in `BackgroundTasks`**.
+
+## 13. `ValueError` inside Pydantic becomes a 422
+
+This one's a free win you might be doing the long way. Raise a `ValueError` in a validator and FastAPI turns it into a structured 422 with the right field path:
+
+```python
+import re
+from pydantic import BaseModel, field_validator
+
+STRONG_PASSWORD_PATTERN = re.compile(
+    r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$"
+)
+
+class ProfileCreate(BaseModel):
+    username: str
+    password: str
+
+    @field_validator("password", mode="after")
+    @classmethod
+    def valid_password(cls, password: str) -> str:
+        if not STRONG_PASSWORD_PATTERN.match(password):
+            raise ValueError(
+                "Password must contain at least one lowercase letter, "
+                "one uppercase letter, one digit, and one special character"
+            )
+        return password
+```
+
+No `HTTPException(status_code=400, …)` in the route, no manual error formatting. The client gets a 422 with `{"loc": ["body", "password"], "msg": "...", "type": "value_error"}` and can render it inline next to the password field.
+
+## 14. Hide docs in production. Document everything in dev.
+
+Two parts to this one.
+
+Hide `/docs` and `/redoc` outside of envs where you explicitly want them. Even if your auth is solid, a public OpenAPI schema is a free reconnaissance gift to anyone fuzzing your endpoints:
+
+```python
+from fastapi import FastAPI
+from starlette.config import Config
+
+config = Config(".env")
+ENVIRONMENT = config("ENVIRONMENT")
+SHOW_DOCS_ENVIRONMENT = {"local", "staging"}
+
+app_configs = {"title": "My Cool API"}
+if ENVIRONMENT not in SHOW_DOCS_ENVIRONMENT:
+    app_configs["openapi_url"] = None
+
+app = FastAPI(**app_configs)
+```
+
+In the envs where docs *are* on, give FastAPI enough metadata to actually be useful — `response_model`, `status_code`, `description`, and the `responses` map for routes that return more than one shape:
+
+```python
+from fastapi import APIRouter, status
+
+router = APIRouter()
+
+@router.post(
+    "/endpoints",
+    response_model=DefaultResponseModel,
+    status_code=status.HTTP_201_CREATED,
+    description="Description of the well-documented endpoint",
+    tags=["Endpoint Category"],
+    summary="Summary of the endpoint",
+    responses={
+        status.HTTP_200_OK: {"model": OkResponse, "description": "Ok response"},
+        status.HTTP_201_CREATED: {"model": CreatedResponse, "description": "Created"},
+        status.HTTP_202_ACCEPTED: {"model": AcceptedResponse, "description": "Queued"},
+    },
+)
+async def documented_route():
+    ...
+```
+
+Most teams I've seen treat the OpenAPI page like a deprecated feature — too vague to be useful, so nobody opens it, so nobody invests in making it useful. Spend an hour seeding the metadata once and the contract becomes the source of truth for frontend, mobile, and partners.
+
+## 15. Lock in your DB key naming conventions
+
+SQLAlchemy will autogenerate constraint and index names if you don't tell it otherwise, and those autogenerated names are not what Postgres or anyone with a `psql` window expects. Set them explicitly:
+
+```python
+from sqlalchemy import MetaData
+
+POSTGRES_INDEXES_NAMING_CONVENTION = {
+    "ix": "%(column_0_label)s_idx",
+    "uq": "%(table_name)s_%(column_0_name)s_key",
+    "ck": "%(table_name)s_%(constraint_name)s_check",
+    "fk": "%(table_name)s_%(column_0_name)s_fkey",
+    "pk": "%(table_name)s_pkey",
+}
+metadata = MetaData(naming_convention=POSTGRES_INDEXES_NAMING_CONVENTION)
+```
+
+This costs nothing on day 1 and saves you the day you have to debug a "constraint X violates Y" error and the name in the error doesn't match anything in your code or your migrations.
+
+## 16. Migrations: static, reversible, descriptive
+
+Three Alembic rules from the repo, all worth repeating:
+
+1. **Migrations must be static and reversible.** If a migration depends on runtime data, that data goes in a fixture or a separate data migration — the schema part has to be deterministic so it produces the same result on every env.
+2. **Generate migrations with descriptive slugs.** Not `auto`, not the random hex hash — write a slug that explains the change. Future-you reading `alembic history` will thank you.
+3. **Use a date-prefixed filename template.** Add this to `alembic.ini`:
+
+   ```ini
+   file_template = %%(year)d-%%(month).2d-%%(day).2d_%%(slug)s
+   ```
+
+   You get filenames like `2026-05-16_post_content_idx.py`, which sort cleanly and make conflicts trivially visible in PR diffs.
+
+## 17. DB naming conventions
+
+Pick a convention, write it down, and enforce it in review. The set the original repo recommends:
+
+1. `lower_snake_case` for everything.
+2. Singular table names: `post`, `post_like`, `user_playlist` — not `posts`.
+3. Module prefix to group related tables: `payment_account`, `payment_bill`.
+4. Consistent FK names: `profile_id` everywhere, unless a more specific name carries meaning (e.g. `creator_id` only when the table really only ever holds creators).
+5. `_at` suffix for datetime columns (`created_at`, `updated_at`).
+6. `_date` suffix for date columns (`birth_date`).
+
+None of these are objectively right. What matters is picking one and not relitigating it every PR.
+
+## 18. SQL-first, Pydantic-second
+
+The temptation in any Python-heavy team is to fetch wide and reshape in Python — pull all the posts, all the profiles, then loop in app code to build the response. The database is almost always faster, and the resulting endpoint is almost always simpler.
+
+```python
+# src/posts/service.py
+from sqlalchemy import desc, func, select, text
+from sqlalchemy.sql.functions import coalesce
+from src.database import database, posts, profiles
+
+async def get_posts(
+    creator_id: UUID4, *, limit: int = 10, offset: int = 0
+) -> list[dict[str, Any]]:
+    select_query = (
+        select(
+            posts.c.id,
+            posts.c.slug,
+            posts.c.title,
+            func.json_build_object(
+                text("'id', profiles.id"),
+                text("'first_name', profiles.first_name"),
+                text("'last_name', profiles.last_name"),
+                text("'username', profiles.username"),
+            ).label("creator"),
+        )
+        .select_from(posts.join(profiles, posts.c.owner_id == profiles.c.id))
+        .where(posts.c.owner_id == creator_id)
+        .limit(limit)
+        .offset(offset)
+        .order_by(
+            desc(coalesce(posts.c.updated_at, posts.c.published_at, posts.c.created_at))
+        )
+    )
+    return await database.fetch_all(select_query)
+```
+
+Postgres assembles the nested `creator` object in a single round trip. Pydantic on the way out is just for shape validation, not for stitching data together. The same query in "fetch posts, then fetch each creator, then zip" form is a textbook N+1 — and the kind that takes three months to surface because it only matters at production data sizes.
+
+For new projects, use SQLAlchemy 2.0's async API (`AsyncSession`, `async_sessionmaker`) rather than `encode/databases`. The principle is the same; the client is interchangeable.
+
+## 19. Async test client from day 0
+
+If your routes are async and your test client is sync, you will eventually hit "event loop is closed" or "cannot reuse already awaited coroutine" errors that are miserable to debug. Set up the async test client immediately using `httpx` + `ASGITransport`:
+
+```python
+from typing import AsyncGenerator
+import pytest
+from httpx import AsyncClient, ASGITransport
+from src.main import app
+
+@pytest.fixture
+async def client() -> AsyncGenerator[AsyncClient, None]:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+
+@pytest.mark.asyncio
+async def test_create_post(client: AsyncClient):
+    resp = await client.post("/posts")
+    assert resp.status_code == 201
+```
+
+Do not reach for `async_asgi_testclient` — it's unmaintained. Stick with `httpx`.
+
+## 20. Override dependencies in tests; don't monkeypatch internals
+
+`app.dependency_overrides` is the supported way to swap any dependency for a test fake — auth, external clients, S3, anything you don't want hitting the network in a unit test:
+
+```python
+import pytest
+from src.auth.dependencies import parse_jwt_data
+from src.main import app
+
+def fake_user():
+    return {"user_id": "00000000-0000-0000-0000-000000000001"}
+
+@pytest.fixture(autouse=True)
+def _override_auth():
+    app.dependency_overrides[parse_jwt_data] = fake_user
+    yield
+    app.dependency_overrides.clear()
+```
+
+This is also the cleanest way to test authorization logic. Override `parse_jwt_data` to return a non-owner user and assert your route returns 403. No JWT minting in test setup, no shared secret in your fixtures.
+
+## 21. Use ruff
+
+[ruff](https://github.com/astral-sh/ruff) replaces black, isort, autoflake, and ~600 other lint rules in a single Rust binary that runs in milliseconds. There is no remaining argument for keeping the older toolchain on a new project.
+
+A minimal script that's worked for me without needing pre-commit:
+
+```sh
+#!/bin/sh -e
+set -x
+ruff check --fix src
+ruff format src
+```
+
+Wire that into CI and a pre-push git hook and stop thinking about formatting.
+
+## What's missing from the original
+
+A few areas the repo doesn't cover that I'd add to any "best practices" list of my own:
+
+- **Structured logging from day 0.** Pick `structlog` or stdlib `logging` with a JSON formatter, attach a request ID via middleware, and never write a `print` in a route. The cost is one afternoon; the value is every incident investigation after that.
+- **Health endpoints that mean something.** `/livez` should return 200 if the process is up. `/readyz` should check that the DB and Redis connections are actually working. Kubernetes / load balancers need these to be distinct.
+- **Pin a request ID middleware.** Pull it from `X-Request-ID` if the client sent one, otherwise generate a UUID. Stamp it into every log line and return it in the response. Future you debugging a single user's flow will thank you.
+- **OpenTelemetry by default.** The `opentelemetry-instrumentation-fastapi` package gets you traces, metrics, and logs across HTTP, the DB, and outbound HTTPX calls with three lines of setup.
+
+None of these conflict with anything in the original — they're just the next things I'd reach for once the bones are right.
+
+## Links
+
+<LinkPreview href="https://github.com/zhanymkanov/fastapi-best-practices" />
+
+<LinkPreview href="https://github.com/zhanymkanov/fastapi-best-practices/blob/master/AGENTS.md" />
+
+<LinkPreview href="https://fastapi.tiangolo.com/" />
+
+<LinkPreview href="https://docs.pydantic.dev/latest/" />
+
+<LinkPreview href="https://github.com/astral-sh/ruff" />

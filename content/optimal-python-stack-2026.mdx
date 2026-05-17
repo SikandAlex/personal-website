@@ -1,0 +1,218 @@
+---
+title: "The Optimal Production Python Stack for 2026"
+publishedAt: "2026-05-16"
+author: "Alex Sikand"
+summary: "An opinionated, end-to-end pick for building production Python APIs in 2026: FastAPI, SQLAlchemy 2.0 async on psycopg3, uv, ruff, pyright, taskiq, polyfactory, structlog over OpenTelemetry with Sentry as the default backend, and OpenTofu for cloud-agnostic deploys. Every layer named, every alternative ruled out, with links to the repos."
+---
+
+If you're standing up a new Python API in 2026, the ecosystem has finally settled. Most "what should I use for X" questions have a clear answer if you've been paying attention the last 18 months. Here's the full stack I'd ship today, layer by layer, with the reasoning for each pick and the alternative I considered and ruled out.
+
+Two prior posts feed into this one: [FastAPI vs Litestar in 2026](/blog/fastapi-vs-litestar) covers the framework choice in depth, and [Production FastAPI: A Best Practices Field Guide](/blog/fastapi-best-practices) covers the conventions you'd layer on top.
+
+## The cheatsheet
+
+| Layer | Pick | Runner-up |
+| --- | --- | --- |
+| Framework | [FastAPI](https://github.com/fastapi/fastapi) | [Litestar](https://github.com/litestar-org/litestar) |
+| Validation | [Pydantic v2](https://github.com/pydantic/pydantic) | [msgspec](https://github.com/jcrist/msgspec) (FastAPI forces Pydantic) |
+| Error responses | [fastapi-problem](https://github.com/NRWLDev/fastapi-problem) | roll your own RFC 9457 handler |
+| ORM | [SQLAlchemy 2.0 async](https://github.com/sqlalchemy/sqlalchemy) | [Tortoise](https://github.com/tortoise/tortoise-orm) |
+| DB driver | [psycopg3](https://github.com/psycopg/psycopg) | [asyncpg](https://github.com/MagicStack/asyncpg) |
+| Migrations | [Alembic](https://github.com/sqlalchemy/alembic) | — |
+| Type checker | [pyright](https://github.com/microsoft/pyright) (watch [ty](https://github.com/astral-sh/ty)) | [mypy](https://github.com/python/mypy) |
+| Lint/format | [ruff](https://github.com/astral-sh/ruff) | — |
+| Package mgmt | [uv](https://github.com/astral-sh/uv) | — |
+| ASGI server | [uvicorn](https://github.com/encode/uvicorn) | [granian](https://github.com/emmett-framework/granian) |
+| Background jobs | [taskiq](https://github.com/taskiq-python/taskiq) | [arq](https://github.com/python-arq/arq) |
+| Settings | [pydantic-settings](https://github.com/pydantic/pydantic-settings) | — |
+| Test runner | [pytest](https://github.com/pytest-dev/pytest) | — |
+| Test data | [polyfactory](https://github.com/litestar-org/polyfactory) | [factory_boy](https://github.com/FactoryBoy/factory_boy) |
+| Test infra | [testcontainers](https://github.com/testcontainers/testcontainers-python) | — |
+| Local dev | [Docker Compose](https://github.com/docker/compose) | — |
+| Logging API | [structlog](https://github.com/hynek/structlog) | stdlib only |
+| Telemetry | [OpenTelemetry](https://github.com/open-telemetry/opentelemetry-python) | — |
+| Observability backend | [Sentry](https://github.com/getsentry/sentry-python) | Dash0 / Honeycomb |
+| IaC | [OpenTofu](https://github.com/opentofu/opentofu) | [Terraform](https://github.com/hashicorp/terraform) |
+| Conventions | [zhanymkanov/fastapi-best-practices](https://github.com/zhanymkanov/fastapi-best-practices) | — |
+
+Now the reasoning for each one.
+
+## Framework: FastAPI
+
+[FastAPI](https://github.com/fastapi/fastapi) is the default for new Python APIs in 2026. I went through the full case for it in [FastAPI vs Litestar in 2026](/blog/fastapi-vs-litestar), so the short version: [Litestar](https://github.com/litestar-org/litestar) has a better feature list on paper (DTOs, layered controllers, msgspec, a real plugin system), but FastAPI has roughly 12x the stars, the ecosystem most engineers already know, and overwhelmingly more LLM training data. That last factor decides it for most teams. When half your day is spent pair-programming with an AI, the framework your model knows fluently is the framework you ship faster in.
+
+The exceptions: pick Litestar if you have a specific feature need it uniquely solves (WebSocket pub-sub via `channels`, heavy DTO transformations from SQLAlchemy models, a strong objection to Pydantic in your dependency tree). Otherwise FastAPI.
+
+## Validation: Pydantic v2
+
+[Pydantic v2](https://github.com/pydantic/pydantic) is required by FastAPI. I'd pick it anyway. The Rust-based core (`pydantic-core`) is roughly 10x faster than v1, the v2 API is cleaner, and `model_validator` / `field_validator` cover the edge cases that used to require custom code. Pair it with [pydantic-settings](https://github.com/pydantic/pydantic-settings) for configuration, and split your settings across modules the way the [best-practices guide](/blog/fastapi-best-practices) recommends.
+
+## Error responses: fastapi-problem
+
+Every HTTP API eventually invents its own error shape, which is exactly the problem [RFC 9457 — Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457) was written to solve. [fastapi-problem](https://github.com/NRWLDev/fastapi-problem) (and its base library [rfc9457](https://github.com/NRWLDev/rfc9457)) is the easiest way to wire it into FastAPI: subclass a base problem class with a `title` and `status`, raise it from your endpoint, and clients get a structured `application/problem+json` response with `type`, `title`, `status`, `detail`, and `instance` plus any extension members you add. No custom exception handlers, no per-service error format that downstream clients have to learn.
+
+I covered the spec itself, what changed from RFC 7807, and the broader implementation landscape in [RFC 9457: A Standard Shape for HTTP API Errors](/blog/rfc-9457-problem-details-for-http-apis).
+
+## ORM: SQLAlchemy 2.0 async
+
+[SQLAlchemy 2.0](https://github.com/sqlalchemy/sqlalchemy) finally made async a first-class citizen. `AsyncSession`, `async_sessionmaker`, and the `Mapped[]` type-annotated model syntax give you a typed, async ORM with the deepest ecosystem in Python. The historical reason to reach for [Tortoise](https://github.com/tortoise/tortoise-orm), [Piccolo](https://github.com/piccolo-orm/piccolo), or [Ormar](https://github.com/collerek/ormar) ("I want async and SQLAlchemy is sync") no longer holds.
+
+Use SQLAlchemy 2.0 with:
+
+- `AsyncSession` for app code (FastAPI dependency-injected).
+- Sync `Session` for Alembic migrations and ad-hoc scripts.
+- `Mapped[type]` annotations on every column for type-checker support.
+
+The other async ORMs are fine for projects that explicitly want a Django-like API (Tortoise) or a built-in admin UI (Piccolo). For everything else, SQLAlchemy.
+
+**Honorable mention: [SQLModel](https://github.com/fastapi/sqlmodel).** Tiangolo's library that combines SQLAlchemy and Pydantic into a single class so you don't maintain parallel model and schema definitions. Genuinely pleasant for small CRUD services. Two reasons it didn't make the recommended slot: it's still at v0.0.38 after almost five years (which signals the maintainer doesn't consider it stable enough for 1.0), and the "single class" win evaporates as soon as you need separate Create / Read / Update shapes, which is most production APIs. Worth knowing about; not what I'd reach for in a new service today.
+
+## Database driver: psycopg3
+
+[psycopg3](https://github.com/psycopg/psycopg) over [asyncpg](https://github.com/MagicStack/asyncpg) is the call that surprises some people. asyncpg has the per-query speed crown (a recent [goldlapel benchmark](https://goldlapel.com/grounds/django-python/asyncpg-vs-psycopg3-fastapi) puts it ~23% ahead on throughput at 500 concurrent users), 8k stars to psycopg3's 2.4k, and the binary protocol decoding wins on JSONB-heavy workloads. For a SQLAlchemy 2.0 app deployed against modern managed Postgres in 2026, psycopg3 is still the cleaner pick.
+
+The big win is that one driver covers both sync and async. Migrations, scripts, and shells stay sync; FastAPI stays async; both go through psycopg3 with the same connection pool semantics. Feature parity is the second reason: psycopg3 has first-class support for `COPY`, server-side cursors, `pgvector`, and newer Postgres features that asyncpg either lags on or doesn't cover. And the SQLAlchemy 2.0 docs now default to psycopg3 as the recommended async driver (`postgresql+psycopg://...`) precisely because the integration story is smoother.
+
+The deciding factor for most teams is connection pooling. Transaction-mode poolers like PgBouncer break asyncpg's prepared statement cache entirely. Supabase, Neon, and most serverless Postgres providers run transaction-mode pooling by default. You can disable asyncpg's cache (`statement_cache_size=0`) to make it work, but you give up the 15-30% prepared-statement speedup that was supposed to be its advantage. psycopg3 handles transaction-mode pools gracefully out of the box. asyncpg's statement cache also interacts poorly with SQLAlchemy's connection recycling, which is a separate footgun for the ORM crowd.
+
+Pick asyncpg if you're on direct Postgres connections (no pooler), throughput is the bottleneck, and you're writing raw `asyncpg.Pool` code without SQLAlchemy. For everyone else — which is most of us, given how managed Postgres works in 2026 — psycopg3.
+
+## Migrations: Alembic
+
+[Alembic](https://github.com/sqlalchemy/alembic) is the only real option, and it's been stable for years. Three rules from the [best-practices guide](/blog/fastapi-best-practices) worth repeating: migrations must be static and reversible, slugs must be descriptive, and the file template should be date-prefixed (`%%(year)d-%%(month).2d-%%(day).2d_%%(slug)s`) so the alembic history reads chronologically in any directory listing.
+
+## Type checker: pyright (with ty on deck)
+
+[pyright](https://github.com/microsoft/pyright) is my pick for 2026, but worth a closer look because the picture is moving fast.
+
+The three contenders:
+
+| | mypy | pyright | ty |
+| --- | ---: | ---: | ---: |
+| Stars | 20,421 | 15,436 | 18,649 |
+| Created | 2012 | 2019 | May 2025 |
+| Language | Python | TypeScript | Rust |
+| Maintainer | python org | Microsoft | Astral |
+
+[mypy](https://github.com/python/mypy) is the spec-strict original, written in Python, and you feel that on every CI run. pyright is the TypeScript-based Microsoft alternative, roughly 10x faster on real codebases, and it's already what's running in your VS Code via Pylance. Using it at the CLI means CI checks the same thing your editor checks.
+
+The dark horse: [ty](https://github.com/astral-sh/ty), Astral's Rust-based type checker. 18.6k stars in roughly a year, from the team behind ruff and uv. It's still in preview as of this writing, but Astral's track record on toolchain quality is unmatched, and ty is plausibly the answer by late 2026. Build with pyright now and revisit ty when it GAs.
+
+## Lint and format: ruff
+
+[ruff](https://github.com/astral-sh/ruff) replaced black, isort, autoflake, flake8, and a long tail of plugins with one Rust binary that runs in milliseconds. There's no remaining argument for the older toolchain on a new project. Configure it once in `pyproject.toml` and stop thinking about formatting.
+
+## Package management: uv
+
+[uv](https://github.com/astral-sh/uv) is the third tool in Astral's set (alongside ruff and ty) and it has eaten poetry, pip-tools, pyenv, and pipx in a single binary. It's faster than every alternative by an order of magnitude, the lockfile is reproducible, and `uv sync` is the only command you need to remember. Use it for dependency management, virtual envs, and Python version installation. If you're still on poetry in 2026, migrate.
+
+## ASGI server: uvicorn
+
+[uvicorn](https://github.com/encode/uvicorn) is the default and there's no reason to switch. It's stable, well-maintained, what the FastAPI docs assume, and every observability tool integrates with it cleanly.
+
+The escape hatch worth knowing about: [granian](https://github.com/emmett-framework/granian), a Rust-based ASGI server with measurable throughput gains. If you're CPU-bound at the server layer (rare for typical CRUD APIs), give it a try. Otherwise, uvicorn.
+
+## Background jobs: taskiq (not Celery)
+
+[Celery](https://github.com/celery/celery) has 28k stars and 776 open issues. That ratio tells the story. It's a 2009-era library with sync-first internals and async grafted on awkwardly, plus an enormous configuration surface and a worker model that doesn't match FastAPI's event-loop world. For an existing Celery deployment with Beat schedules and polyglot consumers, fine. For a new 2026 FastAPI project, it's the wrong call.
+
+The async-native contenders:
+
+| | arq | taskiq | dramatiq |
+| --- | ---: | ---: | ---: |
+| Stars | 2,914 | 2,139 | 5,232 |
+| Brokers | Redis | Redis, NATS, RabbitMQ, Kafka | Redis, RabbitMQ |
+| Async-native | Yes | Yes (designed for it) | No (sync-first) |
+| Maintainer | Samuel Colvin | taskiq-python org | Bogdan Popa |
+
+[taskiq](https://github.com/taskiq-python/taskiq) is the one I'd reach for. Designed async-first, dependency injection that mirrors FastAPI's `Depends()`, and the broker is pluggable so you can start on Redis and move to NATS or RabbitMQ without rewriting tasks.
+
+[arq](https://github.com/python-arq/arq) is the conservative pick if you only need Redis and prefer a smaller surface area. It's been around since 2016, Samuel Colvin (Pydantic) is behind it, and it's about as boring-and-stable as a task queue gets. Either is a defensible choice.
+
+[dramatiq](https://github.com/Bogdanp/dramatiq) is well-engineered but sync-first like Celery, plus the LGPL license is a yellow flag for some enterprises. Skip unless you have a specific reason.
+
+## Testing: pytest + testcontainers + polyfactory
+
+[pytest](https://github.com/pytest-dev/pytest) is the only real test runner. Nothing surprising here.
+
+[testcontainers-python](https://github.com/testcontainers/testcontainers-python) is what you want for integration tests. Spin up a real Postgres or Redis in a container per test session, run your tests against it, throw it away. No more SQLite-pretending-to-be-Postgres, no docker-compose-up dance in CI, no mock-the-DB tests that pass while production breaks.
+
+For test data:
+
+| | factory_boy | polyfactory |
+| --- | ---: | ---: |
+| Stars | 3,792 | 1,463 |
+| Style | Declarative (manual field generators) | Type-hint-driven (auto-derives from model) |
+| Best for | Django, legacy untyped models | Pydantic / SQLAlchemy 2.0 with `Mapped[]` |
+
+[polyfactory](https://github.com/litestar-org/polyfactory) wins for a 2026 FastAPI stack. Your domain is Pydantic + SQLAlchemy 2.0 with full type annotations, which is exactly what polyfactory is designed to read: `class UserFactory(ModelFactory[User]): ...` is the entire factory. [factory_boy](https://github.com/FactoryBoy/factory_boy) makes you maintain a parallel declaration of each field; polyfactory derives it from the model itself.
+
+factory_boy still wins for Django projects because of `DjangoModelFactory`'s transactional fixture integration. For everything else in 2026, polyfactory.
+
+## Local development: Docker Compose
+
+[Docker Compose](https://github.com/docker/compose) handles local dev: Postgres, Redis, anything else your service talks to, all defined in one `docker-compose.yml` you `docker compose up` and forget about. Pair it with testcontainers and you get the same images in dev and test, two different consumers, fewer "works on my machine" surprises.
+
+## Logging: structlog + stdlib + OpenTelemetry
+
+This deserves its own diagram. The mental model: three independent concerns, not three stacked layers.
+
+```
+Application code
+  └─ log = structlog.get_logger()                          ← API layer
+       └─ stdlib logging (universal sink)                  ← compatibility layer
+            └─ JSON to stdout, OR OTLP LoggingHandler      ← transport layer
+                 └─ OpenTelemetry → backend (Sentry, ...)  ← destination
+```
+
+[structlog](https://github.com/hynek/structlog) is the developer-facing logging API. Not because of JSON rendering (OTel's `LoggingHandler` will turn stdlib logs into OTLP just fine) but because `bind()`, `contextvars.merge_contextvars`, and the processor pipeline give you ergonomics stdlib alone never will. Inject `trace_id` and `span_id` via a custom processor and every log line correlates to the trace it came from.
+
+Stdlib `logging` stays in the middle because every library you depend on (SQLAlchemy, uvicorn, httpx, boto3) emits there. structlog's `ProcessorFormatter` bridges the two so library logs come out in the same JSON shape as your app's logs.
+
+[OpenTelemetry](https://github.com/open-telemetry/opentelemetry-python) handles transport. Auto-instrumentation for FastAPI, SQLAlchemy, and httpx gives you traces for free. Logs go out via OTLP (either directly from the app or through an OTel Collector sidecar that tails stdout).
+
+## Observability backend: Sentry
+
+[Sentry](https://github.com/getsentry/sentry-python) is where I'd send the telemetry. The 2026 framing matters: Sentry now accepts OTLP for both traces and logs (in beta but stable enough to ship on), which means you can treat it as one OTel-compatible backend among many. The setup:
+
+- Always run OpenTelemetry. It's the universal export layer.
+- Add the Sentry SDK with the `OpenTelemetryIntegration` when you want Sentry-specific error richness (locals on exceptions, breadcrumbs, release tracking, session replay).
+- Point the OTLP exporter env vars at Sentry's OTLP endpoints. Switch to Honeycomb, Dash0, Datadog, or Tempo+Loki by changing env vars. Zero application code changes.
+
+Sentry's combination of error monitoring, traces, logs, replays, and a generous free tier makes it an easy starting point for most teams. If you're cost-sensitive at scale or have a strong OTel-purist preference, [Dash0](https://www.dash0.com/) and [Honeycomb](https://www.honeycomb.io/) are the leading alternatives. Same OTLP plumbing, different backend.
+
+## Infrastructure as code: OpenTofu
+
+[Terraform](https://github.com/hashicorp/terraform) (48k stars) was the default for a decade. HashiCorp relicensed it from MPL to the Business Source License in August 2023, which isn't OSI-approved open source and carries commercial-use restrictions. The Linux Foundation forked the last MPL release as [OpenTofu](https://github.com/opentofu/opentofu), which now sits at 28.6k stars (impressive for a 2.5-year-old project) and is fully drop-in compatible with Terraform's HCL.
+
+For a new project in 2026: **OpenTofu**. Same HCL syntax, same provider ecosystem, no licensing risk, no relicensing-surprise future. Spacelift, env0, Scalr, and Terramate all support it. Major cloud providers publish compatible providers.
+
+The enterprise picture is more nuanced: shops with existing HCP Terraform contracts (the rebranded Terraform Cloud) mostly stay put because the migration isn't free and HashiCorp's commercial support matters in regulated industries. But OpenTofu has reached parity for new work, and the Linux Foundation backing makes it safe to bet on.
+
+The reason to put IaC in a "platform-agnostic stack" article: your application code runs on any cloud, but if you bake yourself into AWS CloudFormation or GCP Deployment Manager, you've coupled your operations to a single vendor. HCL with OpenTofu keeps the door open.
+
+## Conventions: the zhanymkanov best-practices guide
+
+[zhanymkanov/fastapi-best-practices](https://github.com/zhanymkanov/fastapi-best-practices) is the rulebook for how to actually structure a FastAPI codebase that survives growth: domain-driven layout, async-route discipline, Pydantic-everywhere, dependency composition, SQL-first data access, async test client from day 0. I went through the full list with commentary in [Production FastAPI: A Best Practices Field Guide](/blog/fastapi-best-practices). The repo also ships an [AGENTS.md](https://github.com/zhanymkanov/fastapi-best-practices/blob/master/AGENTS.md) for LLM consumption, which matters because most of the code in 2026 has an AI in the loop.
+
+## The 30-second summary
+
+For a new Python API in 2026:
+
+> Write it in **FastAPI** with **Pydantic v2**, returning errors via **fastapi-problem** (RFC 9457). Persist to Postgres via **SQLAlchemy 2.0 async** on **psycopg3**, with **Alembic** for migrations. Use **uv** for packaging, **ruff** for lint/format, **pyright** for types (watch **ty**). Serve with **uvicorn**. Run background jobs in **taskiq**. Test with **pytest** + **testcontainers** + **polyfactory**. Develop locally with **Docker Compose**. Log through **structlog**, ship telemetry through **OpenTelemetry**, default the backend to **Sentry**. Deploy infrastructure with **OpenTofu**. Follow the [zhanymkanov best-practices guide](https://github.com/zhanymkanov/fastapi-best-practices) for conventions.
+
+Every pick has a runner-up and the whole stack composes: one async runtime end to end, one type-hint discipline from request through ORM through tests, OTel transport regardless of where the telemetry lands.
+
+If you disagree on any layer, the runner-up column is where to start the argument.
+
+## Links
+
+<LinkPreview href="https://github.com/zhanymkanov/fastapi-best-practices" />
+
+<LinkPreview href="https://github.com/fastapi/fastapi" />
+
+<LinkPreview href="https://github.com/sqlalchemy/sqlalchemy" />
+
+<LinkPreview href="https://github.com/astral-sh/uv" />
+
+<LinkPreview href="https://github.com/astral-sh/ty" />

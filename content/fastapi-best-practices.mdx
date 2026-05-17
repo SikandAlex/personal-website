@@ -586,6 +586,7 @@ Wire that into CI and a pre-push git hook and stop thinking about formatting.
 
 A few areas the repo doesn't cover that I'd add to any "best practices" list of my own:
 
+- **A standard error shape via RFC 9457.** Don't invent another `{ "error": "..." }` format. [`fastapi-problem`](https://github.com/NRWLDev/fastapi-problem) (built on the [`rfc9457`](https://github.com/NRWLDev/rfc9457) base library) gives you a drop-in exception handler that returns `application/problem+json` with `type`, `title`, `status`, `detail`, and `instance`, plus any extension fields you add. Clients stop writing per-service adapters for what should be the most boring part of the API. I covered the spec and the broader implementation landscape in [RFC 9457: A Standard Shape for HTTP API Errors](/blog/rfc-9457-problem-details-for-http-apis).
 - **Structured logging from day 0.** Pick `structlog` or stdlib `logging` with a JSON formatter, attach a request ID via middleware, and never write a `print` in a route. The cost is one afternoon; the value is every incident investigation after that.
 - **Health endpoints that mean something.** `/livez` should return 200 if the process is up. `/readyz` should check that the DB and Redis connections are actually working. Kubernetes / load balancers need these to be distinct.
 - **Pin a request ID middleware.** Pull it from `X-Request-ID` if the client sent one, otherwise generate a UUID. Stamp it into every log line and return it in the response. Future you debugging a single user's flow will thank you.
@@ -598,6 +599,8 @@ None of these conflict with anything in the original — they're just the next t
 <LinkPreview href="https://github.com/zhanymkanov/fastapi-best-practices" />
 
 <LinkPreview href="https://github.com/zhanymkanov/fastapi-best-practices/blob/master/AGENTS.md" />
+
+<LinkPreview href="https://github.com/NRWLDev/fastapi-problem" />
 
 <LinkPreview href="https://fastapi.tiangolo.com/" />
 

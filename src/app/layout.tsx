@@ -29,6 +29,14 @@ export const metadata: Metadata = {
     template: `%s | ${DATA.name}`,
   },
   description: DATA.description,
+  alternates: {
+    canonical: DATA.url,
+    types: {
+      "application/rss+xml": [
+        { url: `${DATA.url}/feed.xml`, title: `${DATA.name} — Blog` },
+      ],
+    },
+  },
   openGraph: {
     title: `${DATA.name}`,
     description: DATA.description,

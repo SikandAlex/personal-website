@@ -38,22 +38,30 @@ export async function generateMetadata({
     return undefined;
   }
 
-  let {
+  const {
     title,
     publishedAt: publishedTime,
+    updatedAt: modifiedTime,
     summary: description,
     image,
   } = post;
 
+  const canonicalUrl = `${DATA.url}/blog/${slug}`;
+
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
       type: "article",
       publishedTime,
-      url: `${DATA.url}/blog/${slug}`,
+      modifiedTime: modifiedTime || publishedTime,
+      authors: [DATA.url],
+      url: canonicalUrl,
       ...(image && {
         images: [
           {
@@ -97,20 +105,31 @@ export default async function Blog({
   const getSlug = (post: (typeof sortedPosts)[0]) =>
     post._meta.path.replace(/\.mdx$/, "");
 
+  const postUrl = `${DATA.url}/blog/${slug}`;
   const jsonLdContent = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
     description: post.summary,
     image: post.image
       ? `${DATA.url}${post.image}`
       : `${DATA.url}/blog/${slug}/opengraph-image`,
-    url: `${DATA.url}/blog/${slug}`,
+    url: postUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": postUrl,
+    },
     author: {
       "@type": "Person",
       name: DATA.name,
+      url: DATA.url,
+    },
+    publisher: {
+      "@type": "Person",
+      name: DATA.name,
+      url: DATA.url,
     },
   }).replace(/</g, "\\u003c");
 

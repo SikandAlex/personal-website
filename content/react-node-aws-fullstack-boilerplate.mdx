@@ -1,0 +1,56 @@
+---
+title: "react-node-aws: A Hand-Rolled Fullstack Boilerplate on AWS"
+publishedAt: "2026-05-17"
+author: "Alex Sikand"
+summary: "My friend Tony Schwartz, a senior engineer at Roku, built react-node-aws — a from-scratch React 19 + Express 5 + AWS CloudFormation boilerplate. No Next.js, no Vercel: just ECS Fargate, S3, DynamoDB, and a fully wired auth flow."
+---
+
+Most "fullstack boilerplates" floating around today are some flavor of Next.js + Vercel + Supabase. Convenient, but you don't really learn how the pieces fit together — you learn how someone else's platform fits them together for you.
+
+My friend [Tony Schwartz](https://www.linkedin.com/in/dtonys/), a Senior Software Engineer at Roku, took the other path with [`react-node-aws`](https://github.com/dtonys/react-node-aws): a from-scratch boilerplate that wires React 19 to an Express 5 API and ships the whole thing to AWS via CloudFormation. Nothing is hidden behind a managed platform.
+
+## The stack
+
+- **Frontend** — React 19, MUI 7, Webpack 5 (no Next.js), built to static assets and served from S3 + CloudFront.
+- **Backend** — Express 5 on Node 24 with the AWS SDK v3, packaged into a Docker image and pushed to ECR.
+- **Compute** — ECS Fargate fronted by an ALB with ACM certs.
+- **Storage** — DynamoDB for app data, S3 for uploads.
+- **Email** — Resend with [MJML](https://mjml.io/) templates, used by the signup/verify and forgot/reset password flows that ship out of the box.
+- **IaC** — Plain CloudFormation YAML, one stack per concern (main, certs, bastion, OpenSearch, ElastiCache, a Word-of-the-Day Lambda).
+
+The optional integrations are where it gets fun. OpenSearch sits behind a bastion host with an SSH tunnel for local dev. ElastiCache Redis does the same. There's a Lambda + EventBridge cron that emails subscribers a "Word of the Day" from the dictionary search index. None of it is required — each piece conditionally wires up based on env vars — but the CloudFormation is already written if you want it.
+
+## Why I like it
+
+The dependency-injection pattern in `src/server/routes.ts` is clean. Controllers receive AWS clients via `Controller.init({ dynamoDocClient, s3Client, ... })`, which makes the optional integrations fall out naturally:
+
+```ts
+apiRoutes.use(AuthController.init({ dynamoDocClient }));
+apiRoutes.use(UploadsController.init({ s3Client }));
+if (opensearchClient) {
+  apiRoutes.use(DictionaryController.init({ opensearchClient, dynamoDocClient }));
+}
+if (process.env.REDIS_URL) {
+  apiRoutes.use(SessionHistoryController.init());
+}
+```
+
+No global singletons, no service locator, no DI framework — just function args.
+
+The auth flow is also fully built: signup, login, email verification, forgot/reset password, with sessions encrypted using a key pulled from AWS Secrets Manager. That's the part most boilerplates hand-wave.
+
+## Worth a look
+
+If you want a reference for how a production AWS deploy actually looks without a managed platform shaving the edges off, this is one of the more readable ones I've come across. The README walks through every manual step, every script, and every CloudFormation update you'll need to get a domain live.
+
+<PersonCard
+  name="Tony Schwartz"
+  role="Senior Software Engineer at Roku — author of react-node-aws."
+  image="/people/tony-schwartz.jpg"
+  linkedinUrl="https://www.linkedin.com/in/dtonys/"
+  githubUrl="https://github.com/dtonys"
+/>
+
+## Links
+
+<LinkPreview href="https://github.com/dtonys/react-node-aws" />

@@ -463,7 +463,7 @@ Three Alembic rules from the repo, all worth repeating:
 2. **Generate migrations with descriptive slugs.** Not `auto`, not the random hex hash — write a slug that explains the change. Future-you reading `alembic history` will thank you.
 3. **Use a date-prefixed filename template.** Add this to `alembic.ini`:
 
-   ```ini
+   ```toml
    file_template = %%(year)d-%%(month).2d-%%(day).2d_%%(slug)s
    ```
 

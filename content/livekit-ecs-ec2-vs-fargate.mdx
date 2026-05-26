@@ -1,0 +1,118 @@
+---
+title: "Self-Hosting LiveKit Agents: Why ECS EC2, Not Fargate"
+publishedAt: "2026-05-25"
+author: "Alex Sikand"
+summary: "ECS Fargate caps task shutdown at 120 seconds. LiveKit's default drain is 30 minutes. If you run voice agents on Fargate, every deploy quietly kills any call longer than two minutes. Here's why the platform mismatch matters and what the LiveKit team actually recommends."
+---
+
+If you self-host the [LiveKit Agents](https://github.com/livekit/agents) framework on AWS and reach for ECS, the obvious default is Fargate — no servers to manage, pay-per-task, fits the rest of a typical containerized stack. It's the wrong default for a voice agent, and the LiveKit team is unusually direct about saying so.
+
+The core issue is a numerical mismatch between two timeouts that aren't usually in the same conversation: ECS Fargate's `stopTimeout` and LiveKit's `drain_timeout`. On Fargate they can't be reconciled. On ECS EC2 they can.
+
+## The two timeouts
+
+These look similar at a glance but mean very different things.
+
+**`stopTimeout` (ECS / container platform):** how long the container runtime waits between sending `SIGTERM` and forcibly `SIGKILL`-ing your process. It's a platform-level kill timer, and the application has no say once it's running out.
+
+- On **Fargate**, AWS hard-caps `stopTimeout` at **120 seconds**. You can request less, you cannot request more.
+- On **ECS EC2** launch type, the cap is **7200 seconds** (2 hours). You set whatever you need.
+
+**`drain_timeout` (LiveKit worker):** how long the LiveKit worker keeps running active sessions after it has been told to shut down. While draining, the worker stops accepting new dispatches but lets in-flight calls finish naturally. It's an application-level grace window — the worker decides when it's actually safe to exit.
+
+- LiveKit's [`WorkerOptions.drain_timeout`](https://docs.livekit.io/agents/ops/deployment/) default is **1800 seconds** (30 minutes).
+
+The two have to line up. If `stopTimeout < drain_timeout`, the platform kills the process before the application has finished draining. Any session still active at the moment of `SIGKILL` ends mid-sentence.
+
+## Why voice agents care about this
+
+For a normal request/response web app, a deploy with a short shutdown window is fine — in-flight requests are short, anything still running at the cutoff was probably hung anyway, and the load balancer can retry.
+
+A voice agent is not that. It's a stateful, long-lived process holding a real-time audio session. There's no retry, no idempotency token. If you kill the process while a caller is talking, the caller hears the line go dead. That's the bug.
+
+[Chris Wilson](https://www.linkedin.com/in/yepher/), a Software Engineer at LiveKit, put it bluntly [in the community forum](https://community.livekit.io/t/livekit-with-ecs-fargate/297):
+
+> We do not recommend ECS Fargate since agents are long running processes and can take a long time to drain. ECS EC2 is much better suited for this sort of workload.
+
+And, in the same thread:
+
+> Voice AI is not generally like a web app. It is a stateful process.
+
+The [second forum thread](https://community.livekit.io/t/session-disruption-when-downscaling-ecs-fargate-tasks/147) hits the same wall from a different trigger — scale-in instead of a deploy — and the answer from the LiveKit team is the same: Fargate's lifecycle model doesn't fit.
+
+## What "every deploy drops calls" actually looks like
+
+The failure mode is silent in the metrics most people watch. The deploy succeeds. The new tasks come up healthy. ECS reports a green deployment. The only people who notice are the callers who were mid-conversation when the swap happened — and they hang up confused, which doesn't show up as a "failed deploy" in any dashboard.
+
+On Fargate with the default config, the sequence on a deploy is:
+
+1. ECS sends `SIGTERM` to the old task.
+2. The LiveKit worker enters drain — stops accepting new dispatches, keeps the active call alive.
+3. **120 seconds later**, Fargate sends `SIGKILL` regardless of what the worker is doing.
+4. The active call dies.
+
+Voice agent calls — intake, scheduling, support — routinely run 3 to 8 minutes. The 2-minute ceiling catches almost all of them.
+
+## Why ECS EC2 fixes it
+
+You can't config your way out of this on Fargate. AWS won't let you raise `stopTimeout` past 120, so you have to change launch types.
+
+On ECS EC2:
+
+- `stopTimeout` can be set up to 7200s, so it can sit at or above the LiveKit `drain_timeout`.
+- The host is a normal EC2 instance you control, so kernel-level signal handling, networking, and lifecycle hooks are all in your hands.
+- You stop paying the Fargate per-task premium — usually a 40–60% reduction in compute cost at steady state for the same vCPU/memory.
+
+The tradeoff is real: you now manage an Auto Scaling Group, an AMI, and capacity yourself instead of letting AWS do it. For a stateless web service that overhead isn't worth it. For a voice agent it is, because you need control over how long your process gets to shut down.
+
+## A sane configuration
+
+If you're migrating, the numbers that matter:
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| ECS launch type | **EC2** | Required — Fargate can't honor a long stop timeout |
+| Container `stopTimeout` | **≥ `drain_timeout`** (e.g. 900s if you drain for 600s) | Ensures the platform never kills before the application is done draining |
+| `WorkerOptions.drain_timeout` | **600–900s** (10–15 min) | Long enough to cover realistic call lengths; not so long that deploys take an hour |
+| Optional: `load_fnc` / `load_threshold` | Tune to refuse new sessions before saturation | Smoother autoscaling, fewer over-loaded workers |
+
+The exact `drain_timeout` you pick depends on your call distribution. Look at p99 call length, add headroom, set it there. The 1800s default makes deploys feel glacial; 600–900s covers virtually all real voice workloads with a sane upper bound.
+
+## When Fargate is fine
+
+This post is specifically about voice agents. The same monorepo I run a LiveKit worker out of also has a normal Node.js API on Fargate, and Fargate is the right answer for that one — requests are short, retries are safe, and managed compute is worth the small premium. Fargate isn't bad; it just doesn't fit stateful long-lived sessions, and AWS won't let you configure around the 120-second cap.
+
+For a stateless web service: Fargate. For a LiveKit agent (or any stateful, long-session workload): ECS EC2.
+
+<PersonCard
+  name="Chris Wilson"
+  role="Software Engineer at LiveKit."
+  image="/people/chris-wilson.jpg"
+  linkedinUrl="https://www.linkedin.com/in/yepher/"
+/>
+
+## Links
+
+<LinkPreview
+  href="https://community.livekit.io/t/livekit-with-ecs-fargate/297"
+  title="LiveKit with ECS Fargate"
+  description='"We do not recommend ECS Fargate since agents are long running processes and can take a long time to drain. ECS EC2 is much better suited for this sort of workload."'
+  siteName="LiveKit Community"
+/>
+
+<LinkPreview
+  href="https://community.livekit.io/t/session-disruption-when-downscaling-ecs-fargate-tasks/147"
+  title="Session disruption when downscaling ECS Fargate tasks"
+  description="Same Fargate lifecycle problem on scale-in instead of deploy. LiveKit staff confirms the platform mismatch."
+  siteName="LiveKit Community"
+/>
+
+<LinkPreview href="https://docs.livekit.io/agents/ops/deployment/" />
+
+<LinkPreview href="https://docs.livekit.io/deploy/custom/deployments/" />
+
+<LinkPreview href="https://docs.livekit.io/transport/self-hosting/" />
+
+<LinkPreview href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html" />
+
+<LinkPreview href="https://github.com/livekit/agents" />

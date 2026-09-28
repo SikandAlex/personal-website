@@ -2,6 +2,7 @@ import { CodeBlock } from "@/components/mdx/code-block";
 import { LinkPreview } from "@/components/mdx/link-preview";
 import { MediaContainer } from "@/components/mdx/media-container";
 import { PersonCard } from "@/components/mdx/person-card";
+import { ProductImage, ProductImageRow } from "@/components/mdx/product-image";
 import type { ComponentProps } from "react";
 
 type CodeProps = ComponentProps<"code"> & {
@@ -12,6 +13,8 @@ export const mdxComponents = {
   LinkPreview,
   MediaContainer,
   PersonCard,
+  ProductImage,
+  ProductImageRow,
   pre: (props: ComponentProps<"pre">) => <CodeBlock {...props} />,
   hr: (props: ComponentProps<"hr">) => (
     <div className="my-10 flex w-full items-center" {...props}>

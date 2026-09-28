@@ -1,10 +1,17 @@
 import type { MetadataRoute } from "next";
-import { allPosts } from "content-collections";
+import { allGearPosts, allPosts } from "content-collections";
 import { DATA } from "@/data/resume";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts: MetadataRoute.Sitemap = allPosts.map((post) => ({
     url: `${DATA.url}/blog/${post._meta.path.replace(/\.mdx$/, "")}`,
+    lastModified: new Date(post.updatedAt || post.publishedAt),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  const gearPosts: MetadataRoute.Sitemap = allGearPosts.map((post) => ({
+    url: `${DATA.url}/gear/${post._meta.path.replace(/\.mdx$/, "")}`,
     lastModified: new Date(post.updatedAt || post.publishedAt),
     changeFrequency: "monthly",
     priority: 0.8,
@@ -23,7 +30,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    {
+      url: `${DATA.url}/gear`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
   ];
 
-  return [...routes, ...posts];
+  return [...routes, ...posts, ...gearPosts];
 }

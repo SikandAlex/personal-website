@@ -7,7 +7,7 @@ import { remarkCodeMeta } from "./src/lib/remark-code-meta";
 const posts = defineCollection({
     name: "posts",
     directory: "content",
-    include: "**/*.mdx",
+    include: "*.mdx",
     schema: z.object({
         title: z.string(),
         publishedAt: z.string(),
@@ -28,7 +28,32 @@ const posts = defineCollection({
     },
 });
 
+const gearPosts = defineCollection({
+    name: "gearPosts",
+    directory: "content/gear",
+    include: "**/*.mdx",
+    schema: z.object({
+        title: z.string(),
+        publishedAt: z.string(),
+        updatedAt: z.string().optional(),
+        author: z.string().optional(),
+        summary: z.string(),
+        image: z.string().optional(),
+        affiliate: z.boolean().default(false),
+        content: z.string(),
+    }),
+    transform: async (document, context) => {
+        const mdx = await compileMDX(context, document, {
+            remarkPlugins: [remarkGfm],
+        });
+        return {
+            ...document,
+            mdx,
+        };
+    },
+});
+
 export default defineConfig({
-    collections: [posts],
+    collections: [posts, gearPosts],
 });
 

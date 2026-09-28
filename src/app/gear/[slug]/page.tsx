@@ -1,0 +1,223 @@
+import { allGearPosts } from "content-collections";
+import { formatDate } from "@/lib/utils";
+import { DATA } from "@/data/resume";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { MDXContent } from "@content-collections/mdx/react";
+import { mdxComponents } from "@/mdx-components";
+import { Comments } from "@/components/comments";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+function getSortedPosts() {
+  return [...allGearPosts].sort((a, b) => {
+    if (new Date(a.publishedAt) > new Date(b.publishedAt)) {
+      return -1;
+    }
+    return 1;
+  });
+}
+
+export async function generateStaticParams() {
+  return allGearPosts.map((post) => ({
+    slug: post._meta.path.replace(/\.mdx$/, ""),
+  }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{
+    slug: string;
+  }>;
+}): Promise<Metadata | undefined> {
+  const { slug } = await params;
+  const post = allGearPosts.find((p) => p._meta.path.replace(/\.mdx$/, "") === slug);
+
+  if (!post) {
+    return undefined;
+  }
+
+  const {
+    title,
+    publishedAt: publishedTime,
+    updatedAt: modifiedTime,
+    summary: description,
+    image,
+  } = post;
+
+  const canonicalUrl = `${DATA.url}/gear/${slug}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      publishedTime,
+      modifiedTime: modifiedTime || publishedTime,
+      authors: [DATA.url],
+      url: canonicalUrl,
+      ...(image && {
+        images: [
+          {
+            url: `${DATA.url}${image}`,
+          },
+        ],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(image && {
+        images: [`${DATA.url}${image}`],
+      }),
+    },
+  };
+}
+
+export default async function GearPost({
+  params,
+}: {
+  params: Promise<{
+    slug: string;
+  }>;
+}) {
+  const { slug } = await params;
+  const sortedPosts = getSortedPosts();
+  const currentIndex = sortedPosts.findIndex(
+    (p) => p._meta.path.replace(/\.mdx$/, "") === slug
+  );
+  const post = sortedPosts[currentIndex];
+
+  if (!post) {
+    notFound();
+  }
+
+  const previousPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+  const nextPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+
+  const getSlug = (post: (typeof sortedPosts)[0]) =>
+    post._meta.path.replace(/\.mdx$/, "");
+
+  const postUrl = `${DATA.url}/gear/${slug}`;
+  const jsonLdContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
+    description: post.summary,
+    image: post.image
+      ? `${DATA.url}${post.image}`
+      : `${DATA.url}/gear/${slug}/opengraph-image`,
+    url: postUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": postUrl,
+    },
+    author: {
+      "@type": "Person",
+      name: DATA.name,
+      url: DATA.url,
+    },
+    publisher: {
+      "@type": "Person",
+      name: DATA.name,
+      url: DATA.url,
+    },
+  }).replace(/</g, "\\u003c");
+
+  return (
+    <section id="gear">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: jsonLdContent,
+        }}
+      />
+      <div className="flex justify-start gap-4 items-center">
+        <Link href="/gear" className="text-sm text-muted-foreground hover:text-foreground transition-colors border border-border rounded-lg px-2 py-1 inline-flex items-center gap-1 mb-6 group" aria-label="Back to Gear">
+          <ChevronLeft className="size-3 group-hover:-translate-x-px transition-transform" />
+          Back to Gear
+        </Link>
+      </div>
+      <div className="flex flex-col gap-4">
+        <h1 className="title font-semibold text-3xl md:text-4xl tracking-tighter leading-tight">
+          {post.title}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {formatDate(post.publishedAt)}
+        </p>
+      </div>
+      <div className="my-6 flex w-full items-center">
+        <div
+          className="flex-1 h-px bg-border"
+          style={{
+            maskImage:
+              "linear-gradient(90deg, transparent, black 8%, black 92%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(90deg, transparent, black 8%, black 92%, transparent)",
+          }}
+        />
+      </div>
+      <p className="mb-8 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+        {post.affiliate
+          ? "Some links in this post are affiliate links, so I may earn a commission if you buy through them. It doesn't change the price you pay or what I recommend."
+          : "No affiliate links and no sponsors in this post. I just recommend what I use."}
+      </p>
+      <article className="prose max-w-full text-pretty font-sans leading-relaxed text-muted-foreground dark:prose-invert">
+        <MDXContent code={post.mdx} components={mdxComponents} />
+      </article>
+
+      <section className="mt-12 pt-8 border-t border-border">
+        <h2 className="text-lg font-semibold mb-4">Comments</h2>
+        <Comments />
+      </section>
+
+      <nav className="mt-12 pt-8 max-w-2xl">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          {previousPost ? (
+            <Link
+              href={`/gear/${getSlug(previousPost)}`}
+              className="group flex-1 flex flex-col gap-1 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+            >
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <ChevronLeft className="size-3" />
+                Previous
+              </span>
+              <span className="text-sm font-medium group-hover:text-foreground transition-colors whitespace-normal wrap-break-word">
+                {previousPost.title}
+              </span>
+            </Link>
+          ) : (
+            <div className="hidden sm:block flex-1" />
+          )}
+
+          {nextPost ? (
+            <Link
+              href={`/gear/${getSlug(nextPost)}`}
+              className="group flex-1 flex flex-col gap-1 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors text-right"
+            >
+              <span className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
+                Next
+                <ChevronRight className="size-3" />
+              </span>
+              <span className="text-sm font-medium group-hover:text-foreground transition-colors whitespace-normal wrap-break-word">
+                {nextPost.title}
+              </span>
+            </Link>
+          ) : (
+            <div className="hidden sm:block flex-1" />
+          )}
+        </div>
+      </nav>
+    </section>
+  );
+}
